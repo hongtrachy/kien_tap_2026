@@ -3,208 +3,833 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incentive Management & Analytics Prototype (Live CSV Data)</title>
+    <title>Hệ thống Quản lý & Phân tích Incentive (Incentive Lifecycle Platform)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#0E5A55',
+                            hover: '#0a433f',
+                            light: '#E6F3F1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- PapaParse CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 flex h-screen overflow-hidden">
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden text-sm">
 
     <!-- SIDEBAR NAVIGATION -->
-    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0">
-        <div>
-            <div class="h-16 flex items-center gap-3 px-6 bg-slate-950 font-bold text-lg text-white border-b border-slate-800">
-                <i class="fa-solid fa-chart-line text-indigo-500 text-xl"></i>
-                <span>Incentive Analytics</span>
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 border-r border-slate-800 select-none">
+        <div class="flex flex-col h-full overflow-y-auto">
+            <!-- Brand & App Identity -->
+            <div class="h-16 flex items-center gap-3 px-5 bg-slate-950 text-white border-b border-slate-800">
+                <div class="w-8 h-8 rounded bg-teal-700 flex items-center justify-center font-bold text-teal-100 text-base">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm leading-tight text-slate-100">Incentive Lifecycle</h1>
+                    <p class="text-[11px] text-slate-400 font-normal">Quản trị & Phân tích Thưởng</p>
+                </div>
             </div>
 
-            
+            <!-- Navigation Links -->
+            <nav class="p-3 space-y-1 flex-1">
+                <div class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Điều hành kỳ</div>
+                
+                <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-gauge w-4 text-center"></i>
+                    <span>Tổng quan kỳ thưởng</span>
+                </button>
 
-            <!-- TAB NAVIGATION BUTTONS -->
-            <nav class="p-4 space-y-1">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-indigo-600 font-medium shadow-sm transition">
-                    <i class="fa-solid fa-house w-5"></i> Dashboard Tổng Quan
+                <button onclick="switchTab('incentives')" id="nav-incentives" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-table-list w-4 text-center"></i>
+                    <span>Danh sách Incentive</span>
+                    <span id="badge-total-employees" class="ml-auto text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">120</span>
                 </button>
-                <button onclick="switchTab('task1')" id="nav-task1" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-calculator w-5"></i> Task 1: Tính Tự Động
+
+                <button onclick="switchTab('validation')" id="nav-validation" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-shield-halved w-4 text-center"></i>
+                    <span>Kiểm tra dữ liệu</span>
+                    <span id="badge-alerts-count" class="ml-auto text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-medium">5</span>
                 </button>
-                <button onclick="switchTab('task2')" id="nav-task2" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-shield-halved w-5"></i> Task 2: Cảnh Báo Lỗi
-                    <span id="badge-alert-count" class="ml-auto bg-amber-500 text-slate-950 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+
+                <button onclick="switchTab('calibration')" id="nav-calibration" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-sliders w-4 text-center"></i>
+                    <span>Hiệu chỉnh Target</span>
+                    <span id="badge-calibration-count" class="ml-auto text-xs bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded font-medium">1</span>
                 </button>
-                <button onclick="switchTab('task3')" id="nav-task3" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-chart-pie w-5"></i> Task 3: Tối Ưu Scheme
+
+                <button onclick="switchTab('approval')" id="nav-approval" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-file-invoice-dollar w-4 text-center"></i>
+                    <span>Phê duyệt & Chi trả</span>
+                </button>
+
+                <div class="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Phân tích & Minh bạch</div>
+
+                <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-chart-line w-4 text-center"></i>
+                    <span>Phân tích Scheme</span>
+                </button>
+
+                <button onclick="switchTab('slip')" id="nav-slip" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-receipt w-4 text-center"></i>
+                    <span>Bản giải trình nhân viên</span>
+                </button>
+
+                <button onclick="switchTab('scheme-designer')" id="nav-scheme-designer" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-compass-drafting w-4 text-center"></i>
+                    <span>Thiết kế & Mô phỏng</span>
                 </button>
             </nav>
-        </div>
 
-        <div class="p-4 border-t border-slate-800 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white">HR</div>
-            <div class="text-xs">
-                <p class="font-semibold text-white">Garment Analytics</p>
-                <p id="sidebar-dataset-info" class="text-slate-400">Chưa nạp dữ liệu</p>
+            <!-- Bottom Session Info -->
+            <div class="p-3 border-t border-slate-800 bg-slate-950/60 text-xs">
+                <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span>Kỳ tính: <strong>Q3/2026</strong></span>
+                    <span class="inline-flex items-center gap-1 text-teal-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span> Sẵn sàng
+                    </span>
+                </div>
+                <p id="sidebar-dataset-label" class="text-[11px] text-slate-400 truncate">Bộ chuẩn Q3 (120 nhân sự)</p>
             </div>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 flex flex-col overflow-y-auto">
-        <header class="bg-white border-b border-slate-200 h-16 px-8 flex items-center justify-between sticky top-0 z-10">
-            <div>
-                <h1 id="page-title" class="text-xl font-bold text-slate-900">Dashboard Tổng Quan Incentive</h1>
-                <p id="data-status-text" class="text-xs text-slate-500">Đang khởi tạo ứng dụng...</p>
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
+        
+        <!-- TOP UTILITY BAR -->
+        <header class="bg-white border-b border-slate-200 h-14 px-6 flex items-center justify-between shrink-0 z-20">
+            <!-- Left: Current Context & Breadcrumb -->
+            <div class="flex items-center gap-3 min-w-0">
+                <span class="font-semibold text-slate-900 text-base" id="topbar-view-title">Tổng quan kỳ thưởng</span>
+                <span class="text-slate-300">|</span>
+                <span class="text-xs text-slate-500 flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded">
+                    <i class="fa-regular fa-calendar text-slate-400"></i> Kỳ Q3/2026 &bull; Bước 5: Validate & Approve
+                </span>
             </div>
-            <div class="flex gap-3">
+
+            <!-- Right: Controls (Role Switcher, Dataset, Privacy, Density) -->
+            <div class="flex items-center gap-3">
+                <!-- Dataset Selector -->
+                <div class="flex items-center gap-1.5 border border-slate-200 rounded px-2 py-1 bg-slate-50 text-xs">
+                    <i class="fa-solid fa-database text-slate-400"></i>
+                    <select id="select-dataset" class="bg-transparent border-none text-slate-700 font-medium focus:ring-0 cursor-pointer">
+                        <option value="benchmark">Bộ chuẩn Q3/2026 (120 nhân sự)</option>
+                        <option value="kaggle">Dữ liệu May mặc Kaggle (1.197 dòng)</option>
+                    </select>
+                </div>
+
                 <input type="file" id="csv-file-input" accept=".csv" class="hidden">
-                <button onclick="document.getElementById('csv-file-input').click()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 text-slate-700">
-                    <i class="fa-solid fa-file-csv mr-2 text-emerald-600"></i> Nạp File CSV Khác
+                <button onclick="document.getElementById('csv-file-input').click()" title="Tải file CSV tùy chọn từ máy" class="p-1.5 border border-slate-200 rounded text-slate-600 hover:bg-slate-100 text-xs">
+                    <i class="fa-solid fa-upload"></i>
                 </button>
-                <button id="btn-reload-data" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
-                    <i class="fa-solid fa-rotate mr-2"></i> Chạy Automation Xử Lý
+
+                <!-- Privacy Mask Toggle (Ẩn/Hiện số tiền) -->
+                <button id="btn-toggle-privacy" onclick="togglePrivacyMode()" title="Bảo vệ dữ liệu nhạy cảm: Ẩn/Hiện số tiền" class="px-2.5 py-1 border border-slate-200 rounded text-xs text-slate-700 hover:bg-slate-100 flex items-center gap-1.5">
+                    <i id="privacy-icon" class="fa-solid fa-eye-slash"></i>
+                    <span id="privacy-text" class="font-medium">Ẩn số tiền</span>
                 </button>
+
+                <!-- Density Toggle (Gọn / Thoải mái) -->
+                <button id="btn-toggle-density" onclick="toggleDensityMode()" title="Chuyển chế độ hiển thị: Gọn / Thoải mái" class="px-2.5 py-1 border border-slate-200 rounded text-xs text-slate-700 hover:bg-slate-100 flex items-center gap-1.5">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                    <span id="density-text" class="font-medium">Chế độ Gọn</span>
+                </button>
+
+                <span class="text-slate-200 h-5 border-r border-slate-200"></span>
+
+                <!-- Interactive Role Switcher -->
+                <div class="flex items-center gap-2">
+                    <label for="select-role" class="text-xs text-slate-500 font-medium">Vai trò:</label>
+                    <select id="select-role" onchange="switchUserRole(this.value)" class="text-xs border border-teal-700 bg-teal-50 text-teal-900 font-semibold px-2.5 py-1 rounded focus:ring-1 focus:ring-teal-700 cursor-pointer">
+                        <option value="cb">C&B Specialist (Thu Trang)</option>
+                        <option value="approver">Hội đồng duyệt / Kế toán (Minh Đ.)</option>
+                        <option value="manager">Line Manager (Quốc Hùng)</option>
+                        <option value="employee">Nhân viên (Trần Thị Bình)</option>
+                    </select>
+                </div>
             </div>
         </header>
 
-        <div class="p-8">
+        <!-- 8-STEP LIFECYCLE BAR -->
+        <div class="stepper-container" id="lifecycle-stepper">
+            <div class="stepper-step completed" title="Bước 1: Thiết lập Target">
+                <span class="step-number"><i class="fa-solid fa-check text-[9px]"></i></span>
+                <span>1. Set Target</span>
+            </div>
+            <div class="stepper-step completed" title="Bước 2: Xác định Scheme thưởng">
+                <span class="step-number"><i class="fa-solid fa-check text-[9px]"></i></span>
+                <span>2. Define Scheme</span>
+            </div>
+            <div class="stepper-step completed" title="Bước 3: Thu thập kết quả kinh doanh">
+                <span class="step-number"><i class="fa-solid fa-check text-[9px]"></i></span>
+                <span>3. Collect Performance</span>
+            </div>
+            <div class="stepper-step completed" title="Bước 4: Tự động tính toán incentive">
+                <span class="step-number"><i class="fa-solid fa-check text-[9px]"></i></span>
+                <span>4. Calculate Incentive</span>
+            </div>
+            <div class="stepper-step active" title="Bước 5: Kiểm tra dữ liệu và phê duyệt hiệu chỉnh">
+                <span class="step-number">5</span>
+                <span>5. Validate & Approve</span>
+            </div>
+            <div class="stepper-step" title="Bước 6: Xuất bảng chi trả sang kế toán/payroll">
+                <span class="step-number">6</span>
+                <span>6. Payment Output</span>
+            </div>
+            <div class="stepper-step" title="Bước 7: Đánh giá và phân tích scheme">
+                <span class="step-number">7</span>
+                <span>7. Analyze & Evaluate</span>
+            </div>
+            <div class="stepper-step" title="Bước 8: Cải tiến scheme cho kỳ kế tiếp">
+                <span class="step-number">8</span>
+                <span>8. Improve Scheme</span>
+            </div>
+        </div>
 
-            <!-- VIEW 1: DASHBOARD TỔNG QUAN -->
-            <div id="view-dashboard" class="tab-view space-y-8">
-                <!-- KPI Cards (Tạo hoàn toàn bằng JS) -->
-                <section class="grid grid-cols-1 md:grid-cols-4 gap-6" id="kpi-cards"></section>
+        <!-- TAB VIEWS WRAPPER -->
+        <div class="flex-1 overflow-y-auto p-6" id="main-content-scroll">
 
-                <!-- Tóm tắt 3 Task trên Dashboard -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <h3 class="font-bold text-slate-900"><i class="fa-solid fa-calculator text-indigo-500 mr-2"></i>Task 1: Tiến Độ Tính Thưởng</h3>
-                            <button onclick="switchTab('task1')" class="text-xs text-indigo-600 font-bold hover:underline">Xem Chi Tiết &rarr;</button>
+            <!-- =================================================================== -->
+            <!-- VIEW 1: TỔNG QUAN KỲ THƯỞNG (OVERVIEW) -->
+            <!-- =================================================================== -->
+            <div id="view-overview" class="tab-view space-y-6">
+                <!-- Flat Indicator Strip (Không AI-slop, không gradient lặp) -->
+                <div class="stat-strip">
+                    <div class="stat-item">
+                        <span class="text-xs text-slate-500 font-medium">Tổng chi phí dự kiến</span>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span class="text-xl font-bold text-slate-900 masked-amount" id="stat-total-payout">0 ₫</span>
+                            <span class="text-xs font-semibold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded" id="stat-budget-ratio">104.8% ngân sách</span>
                         </div>
-                        <p class="text-xs text-slate-500">Đã tự động tính toán cho <strong id="dash-total-rows">0</strong> bản ghi từ file CSV.</p>
-                        <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
-                            <div class="flex justify-between"><span>Số ca đạt Target:</span><strong id="dash-achieved-count" class="text-emerald-600">0</strong></div>
-                            <div class="flex justify-between"><span>Tổng chi phí thưởng:</span><strong id="dash-total-payout" class="text-slate-900">0</strong></div>
+                        <span class="text-[11px] text-slate-400 mt-1">Ngân sách mục tiêu: 80.000.000 ₫ (vượt nhẹ có kiểm soát)</span>
+                    </div>
+
+                    <div class="stat-item">
+                        <span class="text-xs text-slate-500 font-medium">Achievement Rate trung bình</span>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span class="text-xl font-bold text-slate-900" id="stat-avg-rate">102.4%</span>
+                            <span class="text-xs text-slate-500">Toàn công ty</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 mt-1" id="stat-qualified-count">85 / 120 nhân sự đủ điều kiện thưởng (&ge; 70%)</span>
+                    </div>
+
+                    <div class="stat-item">
+                        <span class="text-xs text-slate-500 font-medium">Việc cần xử lý hôm nay</span>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span class="text-xl font-bold text-amber-600" id="stat-pending-tasks">3 việc</span>
+                            <span class="text-xs text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Cần hoàn tất</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 mt-1">1 bản ghi trùng &bull; 1 đề xuất hiệu chỉnh &bull; 1 lô chi trả</span>
+                    </div>
+
+                    <div class="stat-item">
+                        <span class="text-xs text-slate-500 font-medium">Trạng thái kỳ thưởng</span>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span class="text-base font-bold text-slate-900 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-500"></span> Chờ kiểm tra & Phê duyệt
+                            </span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 mt-1">Hạn xuất Payroll: 25/09/2026 (còn 5 ngày)</span>
+                    </div>
+                </div>
+
+                <!-- Action Items Queue (Hôm nay phải làm gì) -->
+                <div class="border border-slate-200 bg-white rounded-md overflow-hidden">
+                    <div class="px-5 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                        <div>
+                            <h2 class="font-semibold text-slate-900 text-sm">Hàng đợi công việc cần xử lý hôm nay (Action Items)</h2>
+                            <p class="text-xs text-slate-500">Hoàn tất 3 việc này để chuyển kỳ Q3/2026 sang bước 6: Payment Output</p>
+                        </div>
+                        <span class="text-xs font-medium text-slate-600 bg-white border border-slate-200 px-2 py-1 rounded">3 mục chờ</span>
+                    </div>
+                    <div class="divide-y divide-slate-100 text-xs" id="overview-action-items">
+                        <!-- Dynamic items generated by app.js -->
+                    </div>
+                </div>
+
+                <!-- 4 Anchor Personas Spotlight (Đối chiếu An, Bình, Chi, Dũng) -->
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div>
+                            <h3 class="font-semibold text-slate-900 text-sm">Bảng đối chiếu 4 nhân vật neo (Proposal Benchmark)</h3>
+                            <p class="text-xs text-slate-500">Minh chứng thực tế về tính toán trước và sau bước kiểm tra, hiệu chỉnh (Target thưởng 20M/người)</p>
+                        </div>
+                        <span class="text-xs text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded font-medium">
+                            <i class="fa-solid fa-check mr-1"></i> Khớp 100% công thức đề án
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nhân viên</th>
+                                    <th>Bộ phận</th>
+                                    <th class="text-right">Target (M)</th>
+                                    <th class="text-right">Thực đạt (M)</th>
+                                    <th class="text-right">Độ khó</th>
+                                    <th class="text-right">Achievement Rate</th>
+                                    <th class="text-right">Hệ số chi trả</th>
+                                    <th class="text-right">Thưởng thô (₫)</th>
+                                    <th class="text-right">Thưởng chuẩn sau duyệt (₫)</th>
+                                    <th>Ghi chú nghiệp vụ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="benchmark-anchor-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =================================================================== -->
+            <!-- VIEW 2: DANH SÁCH INCENTIVE (BẢNG DỮ LIỆU TRUNG TÂM) -->
+            <!-- =================================================================== -->
+            <div id="view-incentives" class="tab-view hidden space-y-4">
+                <!-- Filters & Search Toolbar -->
+                <div class="bg-white border border-slate-200 rounded-md p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2 flex-1 max-w-md">
+                        <div class="relative w-full">
+                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-slate-400"></i>
+                            <input type="text" id="input-search-employee" placeholder="Tìm theo tên, mã NV, phòng ban... (Phím tắt: /)" class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-teal-700">
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <h3 class="font-bold text-slate-900"><i class="fa-solid fa-shield-halved text-amber-500 mr-2"></i>Task 2: Phát Hiện Lỗi Dữ Liệu</h3>
-                            <button onclick="switchTab('task2')" class="text-xs text-indigo-600 font-bold hover:underline">Xem Chi Tiết &rarr;</button>
-                        </div>
-                        <p class="text-xs text-slate-500">Thuật toán phát hiện <strong id="dash-total-anomalies" class="text-amber-600">0 ca bất thường</strong> cần HR & Manager phê duyệt.</p>
-                        <div id="dash-unearned-alert-box" class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 font-medium">
-                            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang tính toán dữ liệu lỗi...
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="filter-incentive-dept" onchange="applyFilters()" class="border border-slate-200 rounded px-2.5 py-1.5 bg-slate-50 focus:outline-none">
+                            <option value="ALL">Tất cả phòng ban</option>
+                        </select>
+
+                        <select id="filter-incentive-status" onchange="applyFilters()" class="border border-slate-200 rounded px-2.5 py-1.5 bg-slate-50 focus:outline-none">
+                            <option value="ALL">Tất cả trạng thái</option>
+                            <option value="VALID">Hợp lệ (Đã tính)</option>
+                            <option value="NEEDS_REVIEW">Cần xem xét / Cảnh báo</option>
+                            <option value="APPROVED">Đã phê duyệt</option>
+                            <option value="PAID">Đã chi trả</option>
+                        </select>
+
+                        <select id="filter-incentive-tier" onchange="applyFilters()" class="border border-slate-200 rounded px-2.5 py-1.5 bg-slate-50 focus:outline-none">
+                            <option value="ALL">Tất cả mức đạt</option>
+                            <option value="BELOW_70">Dưới sàn (&lt; 70%)</option>
+                            <option value="70_100">Đạt một phần (70% - 100%)</option>
+                            <option value="100_120">Đạt mục tiêu (100% - 120%)</option>
+                            <option value="ABOVE_120">Vượt trần (&gt; 120%)</option>
+                            <option value="BUNCHING">Dồn ứ (95% - 99%)</option>
+                        </select>
+
+                        <span class="text-slate-200 h-5 border-r border-slate-200"></span>
+
+                        <button onclick="resetFilters()" class="px-2.5 py-1.5 text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Đặt lại
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Data Grid Table -->
+                <div class="bg-white border border-slate-200 rounded-md overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto min-h-[400px]">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th class="w-10 text-center"><input type="checkbox" id="check-all-employees" onchange="toggleSelectAll(this)"></th>
+                                    <th>Mã NV</th>
+                                    <th>Họ và tên</th>
+                                    <th>Phòng ban</th>
+                                    <th class="text-right cursor-pointer" onclick="sortBy('target')">Target <i class="fa-solid fa-sort text-[10px] text-slate-400"></i></th>
+                                    <th class="text-right cursor-pointer" onclick="sortBy('actual')">Thực đạt <i class="fa-solid fa-sort text-[10px] text-slate-400"></i></th>
+                                    <th class="text-right cursor-pointer" onclick="sortBy('difficultyFactor')">Độ khó <i class="fa-solid fa-sort text-[10px] text-slate-400"></i></th>
+                                    <th class="text-right cursor-pointer" onclick="sortBy('achievementRate')">Achievement Rate <i class="fa-solid fa-sort text-[10px] text-slate-400"></i></th>
+                                    <th class="text-right cursor-pointer" onclick="sortBy('payoutFactor')">Hệ số <i class="fa-solid fa-sort text-[10px] text-slate-400"></i></th>
+                                    <th class="text-right cursor-pointer" onclick="sortBy('incentiveAmount')">Incentive (₫) <i class="fa-solid fa-sort text-[10px] text-slate-400"></i></th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incentive-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table Footer: Pagination & Counts -->
+                    <div class="px-4 py-2.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-600">
+                        <div id="table-selection-summary">Đang hiển thị 120 nhân sự</div>
+                        <div class="flex items-center gap-2" id="table-pagination-controls">
+                            <!-- Pagination buttons -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW 2: TASK 1 (TÍNH TOÁN TỰ ĐỘNG) -->
-            <div id="view-task1" class="tab-view hidden space-y-8">
-                <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+            <!-- =================================================================== -->
+            <!-- VIEW 3: KIỂM TRA DỮ LIỆU & BẤT THƯỜNG (VALIDATION QUEUE) -->
+            <!-- =================================================================== -->
+            <div id="view-validation" class="tab-view hidden space-y-6">
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <div class="flex items-start justify-between border-b border-slate-100 pb-3">
                         <div>
-                            <h2 class="font-bold text-lg text-slate-900">Task 1: Kết Quả Tính Toán Incentive Tự Động</h2>
-                            <p class="text-xs text-slate-500">Công thức: Achievement Rate = Actual Productivity / Targeted Productivity</p>
+                            <h2 class="font-semibold text-slate-900 text-sm">Hàng đợi kiểm tra & phát hiện bất thường dữ liệu</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Tự động quét và phát hiện các lỗi: Hợp đồng trùng lặp, thiếu target, chưa gán scheme, outlier bất thường trước khi tính thưởng.</p>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <label class="text-xs font-semibold text-slate-600">Lọc theo bộ phận:</label>
-                            <select id="filter-dept" class="text-xs border px-3 py-2 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <option value="ALL">Tất cả Bộ Phận</option>
-                            </select>
+                        <button onclick="runFullDataValidation()" class="px-3 py-1.5 bg-teal-800 text-white rounded text-xs font-medium hover:bg-teal-900 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate mr-1"></i> Chạy quét lại toàn bộ
+                        </button>
+                    </div>
+
+                    <!-- Category filter chips -->
+                    <div class="flex items-center gap-2 mt-4 text-xs">
+                        <span class="text-slate-500 font-medium">Lọc theo loại bất thường:</span>
+                        <button onclick="filterValidationQueue('ALL')" class="px-2.5 py-1 rounded bg-slate-900 text-white font-medium" id="val-btn-ALL">Tất cả (<span id="val-count-all">5</span>)</button>
+                        <button onclick="filterValidationQueue('DUPLICATE_ENTRY')" class="px-2.5 py-1 rounded border border-slate-200 text-slate-700 hover:bg-slate-50" id="val-btn-DUPLICATE">Bản ghi trùng (1)</button>
+                        <button onclick="filterValidationQueue('PENDING_CALIBRATION')" class="px-2.5 py-1 rounded border border-slate-200 text-slate-700 hover:bg-slate-50" id="val-btn-CALIB">Chờ hiệu chỉnh độ khó (1)</button>
+                        <button onclick="filterValidationQueue('INVALID_TARGET')" class="px-2.5 py-1 rounded border border-slate-200 text-slate-700 hover:bg-slate-50" id="val-btn-TARGET">Thiếu Target (1)</button>
+                        <button onclick="filterValidationQueue('EXTREME_INCENTIVE')" class="px-2.5 py-1 rounded border border-slate-200 text-slate-700 hover:bg-slate-50" id="val-btn-EXTREME">Outlier vọt mức (1)</button>
+                        <button onclick="filterValidationQueue('UNASSIGNED_SCHEME')" class="px-2.5 py-1 rounded border border-slate-200 text-slate-700 hover:bg-slate-50" id="val-btn-SCHEME">Chưa gán Scheme (1)</button>
+                    </div>
+                </div>
+
+                <!-- Validation Cards Container -->
+                <div class="space-y-4" id="validation-queue-container">
+                    <!-- Populated dynamically: Shows Before vs After comparison, Action buttons -->
+                </div>
+            </div>
+
+            <!-- =================================================================== -->
+            <!-- VIEW 4: HIỆU CHỈNH TARGET (CALIBRATION BOARD) -->
+            <!-- =================================================================== -->
+            <div id="view-calibration" class="tab-view hidden space-y-6">
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <div class="border-b border-slate-100 pb-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="font-semibold text-slate-900 text-sm">Hội đồng Hiệu chỉnh Target (Target Calibration Board)</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Thực hiện tầng Công bằng về Thủ tục: Mọi thay đổi độ khó mục tiêu đều phải có bằng chứng khách quan, được hội đồng độc lập phê duyệt và ghi nhận Audit Log.</p>
+                            </div>
+                            <span class="text-xs font-semibold text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-1 rounded">
+                                Quy chế: QĐ-2026/HC-CB
+                            </span>
                         </div>
                     </div>
-                    <div class="overflow-x-auto max-h-[500px]">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead class="bg-slate-50 border-b text-xs uppercase text-slate-500 font-semibold sticky top-0">
+
+                    <!-- Calibration Proposal Card for Binh -->
+                    <div class="mt-4" id="calibration-proposals-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Audit Log of Calibrations -->
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <h3 class="font-semibold text-slate-900 text-sm mb-3">Nhật ký kiểm toán hiệu chỉnh (Audit Trail)</h3>
+                    <div class="divide-y divide-slate-100 text-xs" id="calibration-audit-log">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- =================================================================== -->
+            <!-- VIEW 5: PHÊ DUYỆT & XUẤT CHI TRẢ (APPROVAL & PAYROLL OUTPUT) -->
+            <!-- =================================================================== -->
+            <div id="view-approval" class="tab-view hidden space-y-6">
+                <!-- Batch status card -->
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="font-semibold text-slate-900 text-sm">Phê duyệt Lô & Xuất File Payroll (Payment Output)</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kiểm tra tính toàn vẹn của lô dữ liệu trước khi khóa kỳ và xuất file CSV sang hệ thống kế toán tiền lương.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="approveEntireBatch()" id="btn-approve-batch" class="px-3 py-1.5 bg-slate-900 text-white rounded text-xs font-medium hover:bg-slate-800 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-stamp"></i> Duyệt toàn bộ lô hợp lệ
+                            </button>
+                            <button onclick="openPayrollExportModal()" id="btn-export-payroll" class="px-3 py-1.5 bg-teal-800 text-white rounded text-xs font-medium hover:bg-teal-900 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-csv"></i> Xuất CSV cho Payroll
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 text-xs">
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <span class="text-slate-500">Trạng thái lô:</span>
+                            <div class="font-bold text-sm text-slate-900 mt-1" id="batch-status-text">Chờ duyệt lô</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <span class="text-slate-500">Số nhân sự chi trả:</span>
+                            <div class="font-bold text-sm text-slate-900 mt-1" id="batch-employee-count">85 nhân sự</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <span class="text-slate-500">Tổng chi phí quyết toán:</span>
+                            <div class="font-bold text-sm text-teal-800 mt-1 masked-amount" id="batch-payout-amount">83.800.000 ₫</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <span class="text-slate-500">Độ lệch so với ngân sách:</span>
+                            <div class="font-bold text-sm text-slate-700 mt-1">+3.800.000 ₫ (+4.75%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Batch Data -->
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-slate-900 text-sm">Xem trước bảng chi trả (Payroll Output Preview)</h3>
+                        <span class="text-xs text-slate-500">Định dạng khớp hệ thống SAP / Oracle Payroll</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <th class="p-3">Ngày</th>
-                                    <th class="p-3">Bộ Phận</th>
-                                    <th class="p-3">Team</th>
-                                    <th class="p-3">Targeted Prod</th>
-                                    <th class="p-3">Actual Prod</th>
-                                    <th class="p-3">Achievement Rate</th>
-                                    <th class="p-3">Incentive Chi Trả</th>
-                                    <th class="p-3">Trạng Thái Validation</th>
+                                    <th>Mã NV</th>
+                                    <th>Họ và tên</th>
+                                    <th>Số tài khoản</th>
+                                    <th>Ngân hàng</th>
+                                    <th class="text-right">Achievement Rate</th>
+                                    <th class="text-right">Thực nhận Incentive (₫)</th>
+                                    <th>Trạng thái duyệt</th>
                                 </tr>
                             </thead>
-                            <tbody id="employee-table-body" class="divide-y text-slate-700 text-xs"></tbody>
+                            <tbody id="payroll-preview-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
                         </table>
                     </div>
-                </section>
+                </div>
             </div>
 
-            <!-- VIEW 3: TASK 2 (CẢNH BÁO LỖI & MONITORING) -->
-            <div id="view-task2" class="tab-view hidden space-y-8">
-                <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b pb-3">
-                            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
-                                Task 2: Chi Tiết Cảnh Báo Lỗi Dữ Liệu
-                            </h3>
-                        </div>
-                        <div id="validation-alerts" class="space-y-3 text-xs max-h-[450px] overflow-y-auto"></div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="font-bold text-slate-900 flex items-center gap-2 border-b pb-3">
-                            <i class="fa-solid fa-chart-bar text-indigo-500"></i>
-                            Phân Loại Bất Thường Dữ Liệu
-                        </h3>
-                        <div id="anomaly-summary-box" class="space-y-3 text-xs"></div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- VIEW 4: TASK 3 (PHÂN TÍCH ANALYTICS & TỐI ƯU SCHEME) -->
-            <div id="view-task3" class="tab-view hidden space-y-8">
-                <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex justify-between items-center border-b pb-4">
+            <!-- =================================================================== -->
+            <!-- VIEW 6: PHÂN TÍCH SCHEME (ANALYTICS & BUNCHING DETECTION) -->
+            <!-- =================================================================== -->
+            <div id="view-analytics" class="tab-view hidden space-y-6">
+                <!-- Section 1: Continuous Payout Curve & Employee Positioning -->
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                         <div>
-                            <h2 class="font-bold text-lg text-slate-900">Task 3: Phân Tích Thực Tế Tương Quan Thưởng vs Productivity</h2>
-                            <p class="text-xs text-slate-500">So sánh chỉ tiêu mong đợi (Targeted) và năng suất thực tế (Actual Productivity) theo từng nhóm thưởng</p>
+                            <h2 class="font-semibold text-slate-900 text-sm">Đường cong chi trả liên tục & Vị trí thực tế của nhân viên</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Tránh "vách đá" bất công (cliff edge) bằng đường cong liên tục từ 70% đến 120%, có mức trần 1.5 bảo vệ ngân sách.</p>
                         </div>
-                        <span class="bg-emerald-50 text-emerald-700 text-xs px-3 py-1 rounded-full font-semibold">Calculated CSV Analytics</span>
+                        <div class="flex items-center gap-3 text-xs">
+                            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-teal-800"></span> Kết quả chuẩn</span>
+                            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full border border-slate-700 bg-white"></span> Kết quả thô</span>
+                            <span class="inline-flex items-center gap-1.5"><span class="w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> Chiều chuyển dịch</span>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 bg-slate-50 p-4 rounded-lg border">
-                            <h4 class="text-sm font-semibold mb-2 text-slate-700">Productivity Thực Tế vs Targeted Theo Khung Thưởng</h4>
-                            <div class="h-80">
-                                <canvas id="productivityChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="bg-amber-50 border border-amber-200 p-5 rounded-lg flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center gap-2 text-amber-800 font-bold mb-2">
-                                    <i class="fa-solid fa-lightbulb text-amber-600 text-lg"></i>
-                                    <span>Tính Toán Tự Động Từ File CSV</span>
-                                </div>
-                                <ul id="task3-insights-list" class="text-xs text-slate-700 space-y-2 mt-2 list-disc list-inside leading-relaxed">
-                                    <!-- Dynamic elements from JS -->
-                                </ul>
-                                <div id="task3-recommendation" class="mt-4 p-3 bg-white rounded border border-amber-200 text-xs text-slate-800">
-                                    <!-- Dynamic text from JS -->
-                                </div>
-                            </div>
+                    <!-- Canvas for Curve Chart -->
+                    <div class="h-80 w-full relative">
+                        <canvas id="payoutCurveCanvas"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 text-center italic">Hình 1: Đường cong chi trả với tọa độ thực tế của nhân viên. Nổi bật An (115%), Bình (85% &rarr; 94.4% sau hiệu chỉnh), Chi (100%), Dũng (110% &rarr; 100% sau gỡ trùng).</p>
+                </div>
+
+                <!-- Section 2: Distribution & Bunching Detection -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 border border-slate-200 bg-white rounded-md p-5">
+                        <h3 class="font-semibold text-slate-900 text-sm mb-2">Phân bố tần suất Achievement Rate & Phát hiện dồn ứ (Clustering)</h3>
+                        <p class="text-xs text-slate-500 mb-4">Phát hiện sự bất thường nếu nhiều nhân viên dồn ngay dưới một mốc cụ thể (ví dụ 95% - 99% ngay dưới mốc 100%).</p>
+                        <div class="h-64">
+                            <canvas id="bunchingChartCanvas"></canvas>
                         </div>
                     </div>
-                </section>
+
+                    <!-- Decision Support: "Đề xuất để cân nhắc" -->
+                    <div class="border border-amber-200 bg-amber-50/60 rounded-md p-5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 text-amber-900 font-semibold text-sm mb-2">
+                                <i class="fa-solid fa-lightbulb text-amber-600"></i>
+                                <span>Khối đề xuất để cân nhắc (Decision Support)</span>
+                            </div>
+                            <p class="text-xs text-slate-700 leading-relaxed">
+                                <strong>Phát hiện từ dữ liệu kỳ Q3:</strong> Có <strong>20 nhân sự (16.7%)</strong> tập trung tại khoảng <strong>95% - 99%</strong> ngay sát mốc 100%.
+                            </p>
+                            <div class="mt-3 p-3 bg-white border border-amber-200 rounded text-xs text-slate-700 space-y-2">
+                                <p><strong>Gợi ý cho Hội đồng Scheme kỳ sau:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                                    <li>Cân nhắc xem lại độ khó của chỉ tiêu tại một số khu vực.</li>
+                                    <li>Cân nhắc điều chỉnh độ dốc đoạn 90% - 100% để tạo động lực nỗ lực tốt hơn, tránh tâm lý nản lòng khi chỉ thiếu 1-2%.</li>
+                                    <li><em>Lưu ý: Hệ thống chỉ đưa ra gợi ý phân tích, không tự ý can thiệp quy chế đã ban hành.</em></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-amber-200 text-[11px] text-amber-900/70">
+                            Cơ chế hỗ trợ ra quyết định &bull; Tuân thủ nguyên tắc không áp đặt
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =================================================================== -->
+            <!-- VIEW 7: BẢN GIẢI TRÌNH NHÂN VIÊN (EMPLOYEE EXPLANATION SLIP) -->
+            <!-- =================================================================== -->
+            <div id="view-slip" class="tab-view hidden space-y-6">
+                <!-- Instruction banner -->
+                <div class="max-w-[480px] mx-auto flex items-center justify-between gap-2 text-xs text-slate-500 px-1">
+                    <span class="text-[11px] font-medium text-slate-600"><i class="fa-solid fa-mobile-screen mr-1 text-teal-700"></i> Mobile View</span>
+                    <div class="flex items-center gap-1.5">
+                        <label for="select-slip-employee" class="text-[11px] text-slate-500">Xem bản của:</label>
+                        <select id="select-slip-employee" onchange="renderEmployeeSlip(this.value)" class="border border-slate-300 rounded px-2 py-1 bg-white font-semibold text-slate-800 text-xs">
+                            <option value="EMP-002">Trần Thị Bình (Hiệu chỉnh độ khó 0.9)</option>
+                            <option value="EMP-001">Nguyễn Văn An (115% - Thưởng 27.5M)</option>
+                            <option value="EMP-003">Lê Hoàng Chi (100% - Thưởng 20.0M)</option>
+                            <option value="EMP-004">Phạm Tiến Dũng (100% sau gỡ trùng)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mobile-friendly Card View -->
+                <div class="employee-slip-card p-6 space-y-5" id="employee-slip-content">
+                    <!-- Populated dynamically by app.js -->
+                </div>
+            </div>
+
+            <!-- =================================================================== -->
+            <!-- VIEW 8: THIẾT KẾ & MÔ PHỎNG SCHEME (WHAT-IF) -->
+            <!-- =================================================================== -->
+            <div id="view-scheme-designer" class="tab-view hidden space-y-6">
+                <div class="border border-slate-200 bg-white rounded-md p-5">
+                    <div class="border-b border-slate-100 pb-3 mb-4 flex items-center justify-between">
+                        <div>
+                            <h2 class="font-semibold text-slate-900 text-sm">Trình thiết kế Scheme & Mô phỏng Ngân sách (What-If Analysis)</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Thay đổi các tham số ngưỡng để mô phỏng tác động trực tiếp lên tổng ngân sách chi trả trước khi ban hành chính sách.</p>
+                        </div>
+                        <button onclick="resetSchemeToDefault()" class="px-3 py-1 border border-slate-200 rounded text-xs text-slate-600 hover:bg-slate-100">
+                            Mặc định ban đầu
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <label class="font-semibold text-slate-700 block">Ngưỡng sàn (Floor):</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="input-param-floor" min="50" max="85" value="70" step="5" class="w-full" oninput="updateWhatIfSim()">
+                                <span class="font-bold text-slate-900 text-sm w-12 text-right" id="val-param-floor">70%</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">Dưới mức này: 0% thưởng</span>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <label class="font-semibold text-slate-700 block">Ngưỡng đạt mục tiêu:</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="input-param-target" min="90" max="110" value="100" step="5" class="w-full" oninput="updateWhatIfSim()">
+                                <span class="font-bold text-slate-900 text-sm w-12 text-right" id="val-param-target">100%</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">Đạt mức này: 1.0 lần thưởng</span>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <label class="font-semibold text-slate-700 block">Ngưỡng chạm trần:</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="input-param-max" min="110" max="150" value="120" step="5" class="w-full" oninput="updateWhatIfSim()">
+                                <span class="font-bold text-slate-900 text-sm w-12 text-right" id="val-param-max">120%</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">Mốc bắt đầu cố định trần</span>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <label class="font-semibold text-slate-700 block">Hệ số trần (Cap):</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="input-param-cap" min="1.2" max="2.0" value="1.5" step="0.1" class="w-full" oninput="updateWhatIfSim()">
+                                <span class="font-bold text-slate-900 text-sm w-12 text-right" id="val-param-cap">1.5x</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">Mức chi trả tối đa</span>
+                        </div>
+                    </div>
+
+                    <!-- Simulation Result Summary -->
+                    <div class="mt-4 p-4 bg-teal-50/60 border border-teal-200 rounded-md flex items-center justify-between text-xs">
+                        <div>
+                            <span class="text-teal-900 font-semibold text-sm">Kết quả mô phỏng trên 120 nhân sự:</span>
+                            <p class="text-slate-600 mt-0.5">Tổng chi phí ước tính: <strong id="sim-total-cost" class="text-teal-900 text-sm">83.800.000 ₫</strong> &bull; Chênh lệch với ngân sách 80M: <strong id="sim-delta-cost" class="text-teal-800">+3.800.000 ₫ (+4.75%)</strong></p>
+                        </div>
+                        <button onclick="applySimToCurrentScheme()" class="px-3 py-1.5 bg-teal-800 text-white rounded text-xs font-medium hover:bg-teal-900 transition">
+                            Áp dụng thử vào kỳ
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
     </main>
 
-    <!-- JS Files -->
-    <script src="js/automation.js"></script>
-    <script src="js/charts.js"></script>
+    <!-- =================================================================== -->
+    <!-- DRAWER CHI TIẾT KHOẢN INCENTIVE (TRƯỢT TỪ BÊN PHẢI) -->
+    <!-- =================================================================== -->
+    <div id="drawer-backdrop" class="drawer-backdrop hidden" onclick="closeDrawer()"></div>
+    <div id="drawer-panel" class="drawer-panel">
+        <!-- Header -->
+        <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between shrink-0">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-slate-900 text-base" id="drawer-emp-name">Nguyễn Văn An</span>
+                    <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono" id="drawer-emp-code">MB-014</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5" id="drawer-emp-role-dept">Chuyên viên Kinh doanh &bull; Kinh doanh Miền Bắc</p>
+            </div>
+            <button onclick="closeDrawer()" class="text-slate-400 hover:text-slate-700 p-1.5 rounded hover:bg-slate-200 text-base">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-5 text-xs">
+            <!-- Payout Summary Highlight -->
+            <div class="p-4 bg-teal-50/70 border border-teal-200 rounded-md">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-teal-900 font-semibold text-xs uppercase tracking-wider">Incentive Thực Nhận</span>
+                        <div class="text-2xl font-bold text-teal-900 mt-1 tabular-nums masked-amount" id="drawer-payout-amount">27.500.000 ₫</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-500">Hệ số chi trả</span>
+                        <div class="text-lg font-bold text-slate-900 mt-0.5 tabular-nums" id="drawer-payout-factor">1.375x</div>
+                    </div>
+                </div>
+                <div class="mt-2 pt-2 border-t border-teal-200/60 flex items-center justify-between text-[11px] text-teal-900/80">
+                    <span>Mức thưởng mục tiêu: 20.000.000 ₫</span>
+                    <span id="drawer-payout-status-badge" class="font-medium">Đã tính hợp lệ</span>
+                </div>
+            </div>
+
+            <!-- Traceability: Step-by-Step Calculation Breakdown -->
+            <div class="border border-slate-200 rounded-md p-4 bg-white space-y-3">
+                <h4 class="font-semibold text-slate-900 text-xs uppercase tracking-wider border-b border-slate-100 pb-2">
+                    <i class="fa-solid fa-calculator text-teal-700 mr-1.5"></i>
+                    Bóc tách công thức tính toán (Truy vết con số)
+                </h4>
+                
+                <div class="space-y-2.5">
+                    <!-- Step 1: Target & Difficulty -->
+                    <div class="flex items-center justify-between p-2 rounded hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition" onclick="showTraceInfo('target')">
+                        <div>
+                            <span class="font-medium text-slate-700">1. Target hiệu chỉnh:</span>
+                            <p class="text-[11px] text-slate-400">Target gốc &times; Hệ số độ khó</p>
+                        </div>
+                        <div class="text-right font-mono font-semibold text-slate-900" id="drawer-step-target">
+                            800M &times; 1.0 = 800M
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Actual Performance -->
+                    <div class="flex items-center justify-between p-2 rounded hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition" onclick="showTraceInfo('actual')">
+                        <div>
+                            <span class="font-medium text-slate-700">2. Doanh số thực đạt (Actual):</span>
+                            <p class="text-[11px] text-slate-400">Tổng từ các hợp đồng nghiệm thu</p>
+                        </div>
+                        <div class="text-right font-mono font-semibold text-slate-900" id="drawer-step-actual">
+                            920M VNĐ
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Achievement Rate -->
+                    <div class="flex items-center justify-between p-2 rounded hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition" onclick="showTraceInfo('rate')">
+                        <div>
+                            <span class="font-medium text-slate-700">3. Achievement Rate:</span>
+                            <p class="text-[11px] text-slate-400">Actual &divide; Target hiệu chỉnh</p>
+                        </div>
+                        <div class="text-right font-mono font-bold text-teal-800" id="drawer-step-rate">
+                            920 / 800 = 115.0%
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Payout Factor -->
+                    <div class="flex items-center justify-between p-2 rounded hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-200 transition" onclick="showTraceInfo('factor')">
+                        <div>
+                            <span class="font-medium text-slate-700">4. Hệ số chi trả (Đường cong liên tục):</span>
+                            <p class="text-[11px] text-slate-400">Tra theo đường cong 70% - 100% - 120%</p>
+                        </div>
+                        <div class="text-right font-mono font-bold text-teal-800" id="drawer-step-factor">
+                            1.0 + (115% - 100%)/20% &times; 0.5 = 1.375
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trace Info Box (Active explanation) -->
+                <div id="drawer-trace-popover" class="p-2.5 bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-600 leading-relaxed">
+                    <i class="fa-solid fa-circle-info text-teal-700 mr-1"></i> Bấm vào bất kỳ dòng nào phía trên để xem chi tiết nguồn dữ liệu.
+                </div>
+            </div>
+
+            <!-- List of Contributing Contracts -->
+            <div class="border border-slate-200 rounded-md p-4 bg-white space-y-3">
+                <h4 class="font-semibold text-slate-900 text-xs uppercase tracking-wider border-b border-slate-100 pb-2">
+                    <i class="fa-solid fa-file-lines text-slate-500 mr-1.5"></i>
+                    Chi tiết hợp đồng doanh số cấu thành
+                </h4>
+                <div class="divide-y divide-slate-100" id="drawer-contracts-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Audit Trail / Change Log -->
+            <div class="border border-slate-200 rounded-md p-4 bg-white space-y-3">
+                <h4 class="font-semibold text-slate-900 text-xs uppercase tracking-wider border-b border-slate-100 pb-2">
+                    <i class="fa-solid fa-clock-rotate-left text-slate-500 mr-1.5"></i>
+                    Nhật ký kiểm toán (Audit Trail)
+                </h4>
+                <div class="space-y-2 text-[11px]" id="drawer-audit-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2 shrink-0">
+            <button onclick="closeDrawer()" class="px-3 py-1.5 border border-slate-300 rounded text-xs text-slate-700 hover:bg-slate-100">Đóng</button>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL XÁC NHẬN XUẤT PAYROLL (AN TOÀN NGHIỆP VỤ) -->
+    <!-- =================================================================== -->
+    <div id="payroll-modal" class="modal-overlay hidden">
+        <div class="bg-white rounded-md border border-slate-200 shadow-xl max-w-md w-full p-5 space-y-4">
+            <div class="flex items-center gap-3 text-slate-900">
+                <div class="w-9 h-9 rounded bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-file-export"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm">Xác nhận xuất bảng chi trả Payroll</h3>
+                    <p class="text-xs text-slate-500">Kỳ quyết toán Q3/2026</p>
+                </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-2 text-xs">
+                <div class="flex justify-between"><span>Số nhân sự được chi trả:</span><strong id="modal-emp-count" class="text-slate-900">85 người</strong></div>
+                <div class="flex justify-between"><span>Tổng số tiền chuyển khoản:</span><strong id="modal-total-amount" class="text-teal-800 tabular-nums font-bold">83.800.000 ₫</strong></div>
+                <div class="flex justify-between"><span>Tình trạng kiểm tra dữ liệu:</span><strong class="text-emerald-700"><i class="fa-solid fa-check"></i> Đã xử lý toàn bộ bất thường</strong></div>
+                <div class="flex justify-between"><span>Phê duyệt hội đồng hiệu chỉnh:</span><strong class="text-emerald-700"><i class="fa-solid fa-check"></i> Đã duyệt hệ số</strong></div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+                Sau khi xuất file, trạng thái của lô sẽ chuyển thành <strong>"Đã Chi Trả (PAID)"</strong> và toàn bộ dữ liệu kỳ Q3/2026 sẽ được khóa để lưu trữ kiểm toán.
+            </p>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button onclick="closePayrollModal()" class="px-3 py-1.5 border border-slate-300 rounded text-xs text-slate-700 hover:bg-slate-100">Hủy</button>
+                <button onclick="executePayrollExportCSV()" class="px-3 py-1.5 bg-teal-800 text-white rounded text-xs font-semibold hover:bg-teal-900 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-download"></i> Xác nhận & Tải File CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="js/engine.js"></script>
+    <script src="js/dataset.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
