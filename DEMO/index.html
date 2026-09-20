@@ -3,24 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống Quản lý và Đề xuất Thưởng Thông minh</title>
+    <title>Hệ thống Quản lý và Đề xuất Thưởng</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            DEFAULT: '#0E5A55',
-                            hover: '#0a433f',
-                            light: '#E6F3F1'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
@@ -29,891 +14,618 @@
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-slate-50 text-slate-800 flex flex-col h-screen overflow-hidden text-sm">
+<body class="bg-slate-50 font-sans text-slate-800 flex h-screen overflow-hidden text-sm">
 
-    <!-- TOP GLOBAL BAR & HORIZONTAL NAVIGATION -->
-    <header class="bg-slate-900 text-white flex flex-col shrink-0 border-b border-slate-800 select-none z-30">
-        <!-- Brand & Utility Row -->
-        <div class="h-14 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-teal-700 flex items-center justify-center font-bold text-teal-100 text-base">
-                    <i class="fa-solid fa-scale-balanced"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-sm leading-tight text-slate-100">Quản lý & Đề xuất Thưởng</h1>
-                    <p class="text-[11px] text-slate-400 font-normal">Nền tảng Tự động hóa & Phân tích Đãi ngộ</p>
-                </div>
-                <span class="ml-3 px-2 py-0.5 rounded text-[11px] bg-teal-900/60 text-teal-300 border border-teal-700/50">Kỳ Q3/2026</span>
+    <!-- SIDEBAR NAVIGATION (Layout gốc sạch sẽ, thanh thoát) -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 select-none">
+        <div>
+            <!-- Brand -->
+            <div class="h-16 flex items-center gap-3 px-6 bg-slate-950 font-bold text-base text-white border-b border-slate-800">
+                <i class="fa-solid fa-chart-line text-indigo-400 text-lg"></i>
+                <span>Quản Lý Thưởng</span>
             </div>
 
-            <!-- Right Controls: Role, Privacy, Density, User Account -->
+            <!-- Role Badge -->
+            <div class="px-6 py-3 border-b border-slate-800/80 bg-slate-900/60">
+                <div class="text-xs text-slate-400">Kỳ đánh giá: <strong class="text-slate-200">Q3/2026</strong></div>
+                <div class="text-xs text-indigo-300 mt-0.5 font-medium" id="sidebar-role-name">Admin C&B & Tài chính</div>
+            </div>
+
+            <!-- Tab Navigation Links -->
+            <nav class="p-3 space-y-1" id="sidebar-nav-container">
+                <!-- Populated dynamically based on role -->
+            </nav>
+        </div>
+
+        <!-- User Info Bottom -->
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <!-- Privacy Mask Toggle (Ẩn/Hiện số tiền) -->
-                <button id="btn-toggle-privacy" onclick="togglePrivacyMode()" title="Bảo vệ dữ liệu nhạy cảm: Ẩn/Hiện số tiền" class="px-2.5 py-1 border border-slate-700 bg-slate-800/60 rounded text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
-                    <i id="privacy-icon" class="fa-solid fa-eye-slash text-slate-400"></i>
-                    <span id="privacy-text" class="font-medium">Ẩn số tiền</span>
-                </button>
-
-                <!-- Density Toggle (Gọn / Thoải mái) -->
-                <button id="btn-toggle-density" onclick="toggleDensityMode()" title="Chuyển chế độ hiển thị: Gọn / Thoải mái" class="px-2.5 py-1 border border-slate-700 bg-slate-800/60 rounded text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-bars-staggered text-slate-400"></i>
-                    <span id="density-text" class="font-medium">Chế độ Gọn</span>
-                </button>
-
-                <span class="text-slate-700 h-4 border-r border-slate-700"></span>
-
-                <!-- Fast Role Switcher for Presentation -->
-                <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-2.5 py-1 rounded">
-                    <span class="text-[11px] text-slate-400 font-medium">Vai trò:</span>
-                    <select id="select-role-quick" onchange="handleRoleSwitch(this.value)" class="text-xs bg-transparent text-teal-300 font-semibold focus:outline-none cursor-pointer">
-                        <option value="admin" class="bg-slate-900 text-white">Quản trị viên (Admin C&B)</option>
-                        <option value="manager" class="bg-slate-900 text-white">Quản lý trực tiếp (Trưởng phòng)</option>
-                        <option value="employee" class="bg-slate-900 text-white">Nhân viên (Trần Thị Bình)</option>
-                    </select>
+                <div id="sidebar-user-avatar" class="w-9 h-9 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
+                    TR
                 </div>
-
-                <!-- User Session Indicator -->
-                <div class="flex items-center gap-2 pl-2">
-                    <div id="user-avatar-badge" class="w-7 h-7 rounded-full bg-teal-800 text-teal-100 font-bold text-xs flex items-center justify-center border border-teal-600">TR</div>
-                    <div class="hidden sm:block text-left">
-                        <div id="user-name-display" class="text-xs font-medium text-slate-200 leading-none">Nguyễn Thu Trang</div>
-                        <div id="user-role-display" class="text-[10px] text-slate-400 mt-0.5 leading-none">Admin C&B & Tài chính</div>
-                    </div>
+                <div>
+                    <div id="sidebar-user-name" class="font-semibold text-white text-xs leading-tight">Nguyễn Thu Trang</div>
+                    <div id="sidebar-user-dept" class="text-slate-400 text-[11px]">Toàn công ty</div>
                 </div>
             </div>
         </div>
+    </aside>
 
-        <!-- Horizontal Nav Tabs Menu (Theo đúng luồng nghiệp vụ) -->
-        <nav id="horizontal-nav-bar" class="px-6 flex items-center gap-1 overflow-x-auto text-xs font-medium border-b border-slate-800 bg-slate-900">
-            <!-- Dynamic Navigation Items rendered by app.js based on role -->
-        </nav>
-    </header>
-
-    <!-- MAIN WORKSPACE -->
-    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto bg-slate-50 relative">
-
-        <!-- ============================================================= -->
-        <!-- TAB 1: TỔNG QUAN KỲ THƯỞNG (VIEW: OVERVIEW)                   -->
-        <!-- ============================================================= -->
-        <section id="view-overview" class="view-panel p-6 space-y-5 hidden">
-            
-            <!-- Automation Status Notice (Chỉ Admin & Quản lý thấy) -->
-            <div id="automation-summary-card" class="bg-white rounded-lg border border-slate-200 p-3.5 shadow-sm flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-teal-50 text-teal-700 flex items-center justify-center text-sm border border-teal-200">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs text-slate-500">Lần xử lý tự động gần nhất: <strong class="text-slate-700">18/09/2026 09:15</strong> &bull; Máy chủ xử lý ngầm (Chỉ xem)</div>
-                        <div class="text-xs text-slate-700 font-medium mt-0.5">
-                            Đã đồng bộ <strong>120/120</strong> bản ghi &bull; Phát hiện <span class="text-amber-600 font-bold">5 cảnh báo dữ liệu</span> &bull; Trạng thái: <span class="text-teal-700 font-semibold">Hoàn tất tính toán ban đầu</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-400">
-                    <i class="fa-solid fa-shield-check text-teal-600"></i> Dữ liệu toàn vẹn
-                </div>
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        
+        <!-- HEADER TRÊN CÙNG -->
+        <header class="bg-white border-b border-slate-200 h-16 px-8 flex items-center justify-between sticky top-0 z-20 shrink-0">
+            <div>
+                <h1 id="page-title" class="text-xl font-bold text-slate-900">Dashboard Tổng Quan</h1>
+                <p id="page-subtitle" class="text-xs text-slate-500 mt-0.5">Tiến độ hoàn thành chỉ tiêu và dự phóng quỹ thưởng kỳ Q3/2026</p>
             </div>
 
-            <!-- Time Filter & As Of Date Controls -->
-            <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center gap-4 flex-wrap">
-                    <div class="flex items-center gap-2">
-                        <label for="select-period" class="text-xs font-semibold text-slate-600">Kỳ đánh giá:</label>
-                        <select id="select-period" onchange="handlePeriodChange(this.value)" class="text-xs border border-slate-300 rounded px-2.5 py-1.5 bg-slate-50 font-medium text-slate-700 focus:ring-1 focus:ring-teal-700">
-                            <option value="Q3_2026" selected>Quý 3/2026 (Kỳ hiện tại)</option>
-                            <option value="Q2_2026">Quý 2/2026 (Đã chốt)</option>
-                            <option value="Q1_2026">Quý 1/2026 (Đã chốt)</option>
-                            <option value="MONTH_09">Tháng 09/2026</option>
-                        </select>
-                    </div>
+            <!-- Utility Controls: Role Switcher & Privacy -->
+            <div class="flex items-center gap-3">
+                <!-- Privacy Toggle -->
+                <button onclick="togglePrivacyMode()" id="btn-toggle-privacy" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-medium text-slate-700 flex items-center gap-1.5 transition">
+                    <i id="privacy-icon" class="fa-solid fa-eye-slash text-slate-500"></i>
+                    <span id="privacy-text">Ẩn số tiền</span>
+                </button>
 
-                    <div class="flex items-center gap-2">
-                        <label for="select-as-of-date" class="text-xs font-semibold text-slate-600">Tính đến ngày:</label>
-                        <select id="select-as-of-date" onchange="handleAsOfDateChange(this.value)" class="text-xs border border-slate-300 rounded px-2.5 py-1.5 bg-slate-50 font-medium text-slate-700 focus:ring-1 focus:ring-teal-700">
-                            <option value="22">Cuối kỳ (Ngày công 22 / Toàn bộ kỳ)</option>
-                            <option value="15" selected>Tuần 3 (Ngày công 15 / 22 - Tiến độ 68.2%)</option>
-                            <option value="10">Tuần 2 (Ngày công 10 / 22 - Tiến độ 45.5%)</option>
-                            <option value="5">Tuần 1 (Ngày công 05 / 22 - Tiến độ 22.7%)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <label for="select-overview-dept" class="text-xs font-semibold text-slate-600">Bộ phận:</label>
-                        <select id="select-overview-dept" onchange="handleDeptFilter(this.value)" class="text-xs border border-slate-300 rounded px-2.5 py-1.5 bg-slate-50 font-medium text-slate-700 focus:ring-1 focus:ring-teal-700">
-                            <option value="ALL">Toàn bộ công ty (4 bộ phận)</option>
-                            <option value="Kinh doanh Miền Bắc">Kinh doanh Miền Bắc</option>
-                            <option value="Kinh doanh Miền Nam">Kinh doanh Miền Nam</option>
-                            <option value="Khách hàng Doanh nghiệp">Khách hàng Doanh nghiệp (B2B)</option>
-                            <option value="Vận hành Bán lẻ">Vận hành Bán lẻ</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="text-[11px] text-slate-400 italic">
-                    * Dữ liệu lũy kế theo ngày là mô phỏng phân bổ có kiểm soát phục vụ dự phóng tiến độ.
+                <!-- Role Switcher -->
+                <div class="flex items-center gap-2 border border-slate-300 rounded-lg px-3 py-1.5 bg-slate-50">
+                    <span class="text-xs text-slate-500 font-medium">Vai trò:</span>
+                    <select id="select-role-quick" onchange="handleRoleSwitch(this.value)" class="bg-transparent text-xs font-semibold text-indigo-700 focus:outline-none cursor-pointer">
+                        <option value="admin">Quản trị viên (Admin C&B)</option>
+                        <option value="manager">Quản lý trực tiếp (Trần Minh Đức)</option>
+                        <option value="employee">Nhân viên (Trần Thị Bình)</option>
+                    </select>
                 </div>
             </div>
+        </header>
 
-            <!-- Dải 4 chỉ số phẳng kèm nút "Cách tính" -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <!-- Card 1: Tỷ lệ đạt chỉ tiêu có trọng số -->
-                <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-1">
-                        <span class="text-xs font-medium">Tỷ lệ đạt chỉ tiêu (Có trọng số)</span>
-                        <button onclick="openFormulaModal('weighted_rate')" title="Xem công thức chi tiết" class="text-teal-700 hover:text-teal-900 text-xs font-semibold flex items-center gap-1">
-                            <span>Cách tính</span> <i class="fa-solid fa-circle-question text-[11px]"></i>
-                        </button>
-                    </div>
-                    <div class="text-2xl font-bold text-slate-900 tracking-tight" id="metric-weighted-rate">98,5%</div>
-                    <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
-                        <span>Chỉ tiêu thô: <strong id="metric-raw-rate">96,8%</strong></span>
-                        <span class="text-teal-700 font-medium" id="metric-velocity-badge"><i class="fa-solid fa-arrow-trend-up"></i> Tốc độ: 1.02x</span>
-                    </div>
-                </div>
+        <!-- CONTAINER NỘI DUNG CHÍNH -->
+        <div class="p-8 space-y-6">
 
-                <!-- Card 2: Thưởng tạm tính đến ngày -->
-                <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-1">
-                        <span class="text-xs font-medium">Khoản thưởng tạm tính đến ngày</span>
-                        <button onclick="openFormulaModal('interim_incentive')" title="Xem công thức chi tiết" class="text-teal-700 hover:text-teal-900 text-xs font-semibold flex items-center gap-1">
-                            <span>Cách tính</span> <i class="fa-solid fa-circle-question text-[11px]"></i>
-                        </button>
-                    </div>
-                    <div class="text-2xl font-bold text-teal-800 tracking-tight masked-amount" id="metric-interim-amount">1.642.500.000 ₫</div>
-                    <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
-                        <span>Dự phóng cuối kỳ:</span>
-                        <span class="font-semibold text-slate-700 masked-amount" id="metric-projected-amount">1.710.000.000 ₫</span>
-                    </div>
-                </div>
-
-                <!-- Card 3: Chi phí so với Quỹ thưởng -->
-                <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-1">
-                        <span class="text-xs font-medium">Chi phí so với Quỹ thưởng</span>
-                        <button onclick="openFormulaModal('budget_usage')" title="Xem công thức chi tiết" class="text-teal-700 hover:text-teal-900 text-xs font-semibold flex items-center gap-1">
-                            <span>Cách tính</span> <i class="fa-solid fa-circle-question text-[11px]"></i>
-                        </button>
-                    </div>
-                    <div class="text-2xl font-bold text-slate-900 tracking-tight" id="metric-budget-usage">97,7%</div>
-                    <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
-                        <span>Hạn mức quỹ: <strong class="masked-amount">1.750.000.000 ₫</strong></span>
-                        <span class="text-emerald-700 font-medium"><i class="fa-solid fa-shield-check"></i> An toàn</span>
-                    </div>
-                </div>
-
-                <!-- Card 4: Tiến độ so với Thời gian -->
-                <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-1">
-                        <span class="text-xs font-medium">Tiến độ so với Thời gian</span>
-                        <button onclick="openFormulaModal('time_progress')" title="Xem công thức chi tiết" class="text-teal-700 hover:text-teal-900 text-xs font-semibold flex items-center gap-1">
-                            <span>Cách tính</span> <i class="fa-solid fa-circle-question text-[11px]"></i>
-                        </button>
-                    </div>
-                    <div class="text-2xl font-bold text-slate-900 tracking-tight" id="metric-time-progress">68,2%</div>
-                    <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
-                        <span>Thời gian đã trôi qua: <strong>15/22 ngày</strong></span>
-                        <span class="text-slate-600">Thưởng/Doanh số: <strong id="metric-incentive-revenue-ratio">2,1%</strong></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Khối Đề xuất Tối ưu Cơ chế Thưởng (Từ Task 3 chuyển lên Tổng quan) -->
-            <div class="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded bg-amber-50 text-amber-700 flex items-center justify-center text-xs border border-amber-200">
-                            <i class="fa-solid fa-lightbulb"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-sm text-slate-900">Đề xuất Tối ưu Cơ chế Thưởng</h3>
-                            <p class="text-xs text-slate-500">Cân nhắc các điều chỉnh chính sách dựa trên dữ liệu hiệu suất và biến động thị trường</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="opt-undo-countdown" class="hidden text-xs text-amber-700 font-semibold bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
-                            <i class="fa-solid fa-clock"></i> Đã duyệt hàng loạt (Hoàn tác trong <span id="undo-seconds">300</span>s)
-                        </span>
-                        <button id="btn-undo-approval" onclick="undoBulkApproval()" class="hidden px-3 py-1.5 text-xs bg-slate-800 text-white font-medium rounded hover:bg-slate-700 transition">
-                            Hoàn tác
-                        </button>
-                        <button id="btn-approve-all-optimizations" onclick="openConfirmBulkApprovalModal()" class="px-3.5 py-1.5 text-xs bg-teal-800 text-white font-semibold rounded hover:bg-teal-900 transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-check-double"></i> Duyệt tất cả đề xuất
-                        </button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="scheme-optimizations-list">
-                    <!-- Proposal 1 -->
-                    <div class="border border-slate-200 rounded p-3.5 bg-slate-50/50 flex flex-col justify-between" id="opt-card-1">
-                        <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-800">ĐIỀU CHỈNH CHỈ TIÊU</span>
-                                <span class="text-xs text-slate-400 font-medium">Tác động: +6,3M ₫</span>
-                            </div>
-                            <h4 class="font-semibold text-xs text-slate-800 mb-1">Hiệu chỉnh hệ số độ khó 0.9 vùng Đông Nam Bộ</h4>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
-                                <strong>Lý do:</strong> Thị trường bán lẻ khu vực co hẹp 10.2% trong Q3. Điều chỉnh target giúp nhân viên duy trì động lực, công bằng với biến động bất khả kháng.
-                            </p>
-                        </div>
-                        <div class="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-500" id="opt-status-1">Chờ người có quyền duyệt</span>
-                            <button onclick="approveSingleOptimization(1)" class="px-2.5 py-1 bg-white border border-teal-700 text-teal-800 hover:bg-teal-50 rounded text-xs font-semibold">
-                                Duyệt đề xuất
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Proposal 2 -->
-                    <div class="border border-slate-200 rounded p-3.5 bg-slate-50/50 flex flex-col justify-between" id="opt-card-2">
-                        <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">CÂN BẰNG BẬC THƯỞNG</span>
-                                <span class="text-xs text-slate-400 font-medium">Tác động: -12,5M ₫</span>
-                            </div>
-                            <h4 class="font-semibold text-xs text-slate-800 mb-1">Giảm độ dốc vùng dồn ứ (95% - 99%)</h4>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
-                                <strong>Lý do:</strong> Phát hiện 20 nhân sự đang tụ tập ngay sát ngưỡng 100%. Đề xuất phân bậc mịn hơn từ 90% để tránh tâm lý "buông xuôi" hoặc cố gò ép số.
-                            </p>
-                        </div>
-                        <div class="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-500" id="opt-status-2">Chờ người có quyền duyệt</span>
-                            <button onclick="approveSingleOptimization(2)" class="px-2.5 py-1 bg-white border border-teal-700 text-teal-800 hover:bg-teal-50 rounded text-xs font-semibold">
-                                Duyệt đề xuất
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Proposal 3 -->
-                    <div class="border border-slate-200 rounded p-3.5 bg-slate-50/50 flex flex-col justify-between" id="opt-card-3">
-                        <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">TÁCH CƠ CHẾ GÓI VIỆC</span>
-                                <span class="text-xs text-slate-400 font-medium">Tác động: +0,0M ₫</span>
-                            </div>
-                            <h4 class="font-semibold text-xs text-slate-800 mb-1">Gán trọng số riêng cho dự án dài hạn B2B</h4>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
-                                <strong>Lý do:</strong> Chu kỳ nghiệm thu khách hàng doanh nghiệp kéo dài 4-6 tháng. Cần tính trọng số theo độ phức tạp gói thầu để đánh giá đúng công sức.
-                            </p>
-                        </div>
-                        <div class="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-500" id="opt-status-3">Chờ người có quyền duyệt</span>
-                            <button onclick="approveSingleOptimization(3)" class="px-2.5 py-1 bg-white border border-teal-700 text-teal-800 hover:bg-teal-50 rounded text-xs font-semibold">
-                                Duyệt đề xuất
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Biểu đồ Xu hướng Hoàn thành theo Thời gian -->
-            <div class="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="font-bold text-sm text-slate-900">Tỷ lệ Đạt Chỉ tiêu theo Thời gian</h3>
-                        <p class="text-xs text-slate-500" id="chart-sub-title">Đường xu hướng qua 5 kỳ liên tiếp & Đường tham chiếu các mốc thưởng chuẩn</p>
-                    </div>
-                    <!-- Chart Switcher: Trend Line vs Department Horizontal Bar -->
-                    <div class="flex items-center border border-slate-200 rounded p-0.5 bg-slate-50 text-xs">
-                        <button id="btn-chart-mode-line" onclick="setOverviewChartMode('line')" class="px-2.5 py-1 rounded bg-white font-semibold text-slate-800 shadow-sm transition">
-                            <i class="fa-solid fa-chart-line"></i> Xu hướng thời gian
-                        </button>
-                        <button id="btn-chart-mode-bar" onclick="setOverviewChartMode('bar')" class="px-2.5 py-1 rounded text-slate-500 font-medium hover:text-slate-800 transition">
-                            <i class="fa-solid fa-chart-simple fa-rotate-90"></i> So sánh bộ phận
-                        </button>
-                    </div>
-                </div>
-
-                <div class="h-72 w-full relative">
-                    <canvas id="overviewTrendsChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Bảng 4 nhân vật neo minh họa -->
-            <div class="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-3">
-                    <div>
-                        <h3 class="font-bold text-sm text-slate-900">Bảng Đối chiếu 4 Nhân vật Neo (Ground Truth Benchmark)</h3>
-                        <p class="text-xs text-slate-500">Bảo toàn nguyên vẹn 100% số liệu tính toán và các ca thử nghiệm nghiệp vụ</p>
-                    </div>
-                    <span class="text-xs text-slate-400">Ngân sách chuẩn 4 người: 80.000.000 ₫</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs text-left border-collapse">
-                        <thead class="bg-slate-100/70 text-slate-600 uppercase font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="py-2.5 px-3">Nhân sự</th>
-                                <th class="py-2.5 px-3">Bộ phận</th>
-                                <th class="py-2.5 px-3 text-right">Chỉ tiêu</th>
-                                <th class="py-2.5 px-3 text-right">Thực đạt</th>
-                                <th class="py-2.5 px-3 text-right">Tỷ lệ đạt</th>
-                                <th class="py-2.5 px-3 text-right">Hệ số chi trả</th>
-                                <th class="py-2.5 px-3 text-right">Khoản thưởng</th>
-                                <th class="py-2.5 px-3 text-center">Tình trạng xử lý</th>
-                            </tr>
-                        </thead>
-                        <tbody id="overview-anchor-tbody" class="divide-y divide-slate-100">
-                            <!-- Populated by JS -->
-                        </tbody>
-                        <tfoot class="bg-slate-50 font-bold text-slate-800 border-t border-slate-200">
-                            <tr>
-                                <td colspan="6" class="py-2 px-3 text-right">Tổng chi thưởng 4 người:</td>
-                                <td class="py-2 px-3 text-right text-teal-800 masked-amount" id="anchor-total-payout">83.800.000 ₫</td>
-                                <td class="py-2 px-3 text-center text-[11px] text-teal-700">Khớp 104,8% quỹ</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============================================================= -->
-        <!-- TAB 2: ĐỀ XUẤT MỨC THƯỞNG THÔNG MINH (VIEW: RECOMMENDATION)     -->
-        <!-- ============================================================= -->
-        <section id="view-recommendation" class="view-panel p-6 space-y-5 hidden">
-            
-            <!-- Thin Stepper Bar in Recommendation Flow -->
-            <div class="bg-white rounded-lg border border-slate-200 px-4 py-2.5 shadow-sm flex items-center justify-between text-xs">
-                <div class="flex items-center gap-2 sm:gap-6">
-                    <div class="flex items-center gap-1.5 text-teal-800 font-semibold cursor-pointer" onclick="setRecStep(1)">
-                        <span class="w-5 h-5 rounded-full bg-teal-800 text-white flex items-center justify-center text-[10px]">1</span>
-                        <span>Hiệu suất</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
-                    <div class="flex items-center gap-1.5 text-teal-800 font-semibold cursor-pointer" onclick="setRecStep(2)">
-                        <span class="w-5 h-5 rounded-full bg-teal-800 text-white flex items-center justify-center text-[10px]">2</span>
-                        <span>Đề xuất</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
-                    <div class="flex items-center gap-1.5 text-slate-600 font-medium cursor-pointer" onclick="setRecStep(3)">
-                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px]">3</span>
-                        <span>Quyết định</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
-                    <div class="flex items-center gap-1.5 text-slate-400 font-medium cursor-pointer" onclick="setRecStep(4)">
-                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px]">4</span>
-                        <span>Duyệt cấp hai</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
-                    <div class="flex items-center gap-1.5 text-slate-400 font-medium cursor-pointer" onclick="setRecStep(5)">
-                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px]">5</span>
-                        <span>Thông tin chi tiết</span>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <button onclick="handleRecNextStep()" class="px-3 py-1 bg-teal-800 text-white font-medium rounded hover:bg-teal-900 transition flex items-center gap-1.5">
-                        <span>Tiếp theo</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Main Recommendation Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- ============================================================= -->
+            <!-- VIEW 1: TỔNG QUAN (DASHBOARD)                                 -->
+            <!-- ============================================================= -->
+            <div id="view-overview" class="view-panel space-y-6 hidden">
                 
-                <!-- Left Column: Employee Selector & Task List (4 cols) -->
-                <div class="lg:col-span-4 space-y-4">
-                    <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">Nhân sự thuộc quyền</h3>
-                            <span class="text-[11px] text-slate-400" id="rec-team-count">30 nhân sự</span>
-                        </div>
-                        
-                        <!-- Quick Pick Persona Buttons for Demo -->
-                        <div class="flex gap-1.5 mb-3">
-                            <button onclick="selectRecEmployee('EMP-002')" class="flex-1 py-1 px-2 border border-teal-700 bg-teal-50 text-teal-900 font-semibold rounded text-[11px] hover:bg-teal-100">
-                                Bình (EMP-002)
-                            </button>
-                            <button onclick="selectRecEmployee('EMP-001')" class="flex-1 py-1 px-2 border border-slate-200 bg-slate-50 text-slate-700 font-medium rounded text-[11px] hover:bg-slate-100">
-                                An (EMP-001)
-                            </button>
-                            <button onclick="selectRecEmployee('EMP-004')" class="flex-1 py-1 px-2 border border-slate-200 bg-slate-50 text-slate-700 font-medium rounded text-[11px] hover:bg-slate-100">
-                                Dũng (EMP-004)
-                            </button>
+                <!-- Bộ lọc thời gian & tiến độ -->
+                <div class="flex items-center justify-between flex-wrap gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center gap-4 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-600">Kỳ tính:</span>
+                            <select id="select-period" onchange="handlePeriodChange(this.value)" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-slate-50 font-medium">
+                                <option value="Q3_2026">Quý 3/2026 (Kỳ hiện tại)</option>
+                                <option value="Q2_2026">Quý 2/2026</option>
+                                <option value="Q1_2026">Quý 1/2026</option>
+                            </select>
                         </div>
 
-                        <!-- Employee List -->
-                        <div class="space-y-1 max-h-96 overflow-y-auto pr-1" id="rec-employee-list">
-                            <!-- Populated by JS -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-600">Tính đến:</span>
+                            <select id="select-as-of-date" onchange="handleAsOfDateChange(this.value)" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-slate-50 font-medium">
+                                <option value="22">Cuối kỳ (Ngày công 22/22)</option>
+                                <option value="15" selected>Tuần 3 (Ngày công 15/22 - 68.2%)</option>
+                                <option value="10">Tuần 2 (Ngày công 10/22)</option>
+                                <option value="5">Tuần 1 (Ngày công 5/22)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-600">Bộ phận:</span>
+                            <select id="select-overview-dept" onchange="handleDeptFilter(this.value)" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-slate-50 font-medium">
+                                <option value="ALL">Toàn công ty</option>
+                                <option value="Kinh doanh Miền Bắc">Kinh doanh Miền Bắc</option>
+                                <option value="Kinh doanh Miền Nam">Kinh doanh Miền Nam</option>
+                                <option value="Khách hàng Doanh nghiệp">Khách hàng Doanh nghiệp</option>
+                                <option value="Vận hành Bán lẻ">Vận hành Bán lẻ</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Task / Work Packages Breakdown -->
-                    <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2.5">Các gói việc / Đầu việc đảm nhận</h3>
-                        <div class="space-y-2 text-xs" id="rec-tasks-container">
-                            <!-- Populated by JS -->
+                    <div id="automation-info-text" class="text-xs text-slate-500">
+                        Xử lý tự động: <strong class="text-slate-700">18/09/2026 09:15</strong> (120 bản ghi &bull; 5 cảnh báo)
+                    </div>
+                </div>
+
+                <!-- 4 KPI Cards phẳng & to rõ như web gốc -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-xs text-slate-500">
+                            <span>Tỷ lệ đạt chỉ tiêu</span>
+                            <button onclick="openFormulaModal('weighted_rate')" class="text-indigo-600 hover:underline font-medium">Cách tính</button>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-900 mt-2" id="metric-weighted-rate">98,5%</div>
+                        <div class="text-xs text-emerald-600 mt-2 font-medium">
+                            <i class="fa-solid fa-arrow-trend-up mr-1"></i> Tốc độ hoàn thành: 1.02x
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-xs text-slate-500">
+                            <span>Thưởng tạm tính đến ngày</span>
+                            <button onclick="openFormulaModal('interim_incentive')" class="text-indigo-600 hover:underline font-medium">Cách tính</button>
+                        </div>
+                        <div class="text-2xl font-bold text-indigo-600 mt-2 masked-amount" id="metric-interim-amount">1.642.500.000 ₫</div>
+                        <div class="text-xs text-slate-500 mt-2">
+                            Dự phóng cuối kỳ: <strong class="text-slate-700 masked-amount" id="metric-projected-amount">1.710.000.000 ₫</strong>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-xs text-slate-500">
+                            <span>Chi phí so với Quỹ</span>
+                            <button onclick="openFormulaModal('budget_usage')" class="text-indigo-600 hover:underline font-medium">Cách tính</button>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-900 mt-2" id="metric-budget-usage">97,7%</div>
+                        <div class="text-xs text-emerald-600 mt-2 font-medium">
+                            <i class="fa-solid fa-check mr-1"></i> Trong hạn mức 1,75 tỷ ₫
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-xs text-slate-500">
+                            <span>Tiến độ thời gian</span>
+                            <button onclick="openFormulaModal('time_progress')" class="text-indigo-600 hover:underline font-medium">Cách tính</button>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-900 mt-2" id="metric-time-progress">68,2%</div>
+                        <div class="text-xs text-slate-500 mt-2">
+                            Đã qua 15/22 ngày làm việc
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column: 3-Source Breakdown, What-if & Q&A (8 cols) -->
-                <div class="lg:col-span-8 space-y-4">
+                <!-- Khối Tối ưu Cơ chế Thưởng (Gọn gàng, thực chất) -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-900">Đề xuất Tối ưu Cơ chế Thưởng</h3>
+                            <p class="text-xs text-slate-500">Các điều chỉnh chính sách dựa trên dữ liệu hiệu suất kỳ này</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="opt-undo-countdown" class="hidden text-xs text-amber-800 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 font-semibold">
+                                Đã duyệt hàng loạt (Hoàn tác trong <span id="undo-seconds">300</span>s)
+                            </span>
+                            <button id="btn-undo-approval" onclick="undoBulkApproval()" class="hidden px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-lg">
+                                Hoàn tác
+                            </button>
+                            <button id="btn-approve-all-optimizations" onclick="openConfirmBulkApprovalModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition">
+                                Duyệt tất cả đề xuất
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="scheme-optimizations-list">
+                        <!-- Card 1 -->
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between" id="opt-card-1">
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-indigo-700">ĐIỀU CHỈNH CHỈ TIÊU</span>
+                                    <span class="text-slate-500">+6,3M ₫</span>
+                                </div>
+                                <h4 class="font-semibold text-slate-900 text-xs">Hệ số độ khó 0.9 vùng Đông Nam Bộ</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Thị trường khu vực co hẹp 10.2%. Hiệu chỉnh giúp đảm bảo công bằng với biến động bất khả kháng.
+                                </p>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                                <span class="text-slate-500" id="opt-status-1">Chờ duyệt</span>
+                                <button onclick="approveSingleOptimization(1)" class="px-3 py-1 bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold rounded">Duyệt</button>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between" id="opt-card-2">
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-indigo-700">CÂN BẰNG BẬC THƯỞNG</span>
+                                    <span class="text-slate-500">-12,5M ₫</span>
+                                </div>
+                                <h4 class="font-semibold text-slate-900 text-xs">Giảm độ dốc vùng dồn ứ (95% - 99%)</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    20 nhân sự đang tập trung sát mốc 100%. Phân bậc mịn hơn để tránh tâm lý gò ép số.
+                                </p>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                                <span class="text-slate-500" id="opt-status-2">Chờ duyệt</span>
+                                <button onclick="approveSingleOptimization(2)" class="px-3 py-1 bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold rounded">Duyệt</button>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between" id="opt-card-3">
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-indigo-700">TRỌNG SỐ GÓI VIỆC</span>
+                                    <span class="text-slate-500">+0,0M ₫</span>
+                                </div>
+                                <h4 class="font-semibold text-slate-900 text-xs">Gán trọng số cho hợp đồng B2B</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Gói thầu lớn kéo dài 4-6 tháng được tính trọng số riêng phản ánh đúng công sức.
+                                </p>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                                <span class="text-slate-500" id="opt-status-3">Chờ duyệt</span>
+                                <button onclick="approveSingleOptimization(3)" class="px-3 py-1 bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold rounded">Duyệt</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biểu đồ Xu hướng (Thoáng mắt như web gốc) -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-900">Tiến Độ và Xu Hướng Hoàn Thành Chỉ Tiêu</h3>
+                            <p class="text-xs text-slate-500" id="chart-sub-title">Đường xu hướng qua 5 kỳ liên tiếp & Đường tham chiếu các mốc thưởng chuẩn</p>
+                        </div>
+                        <div class="flex gap-2 text-xs">
+                            <button id="btn-chart-mode-line" onclick="setOverviewChartMode('line')" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium">Xu hướng kỳ</button>
+                            <button id="btn-chart-mode-bar" onclick="setOverviewChartMode('bar')" class="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium">So sánh bộ phận</button>
+                        </div>
+                    </div>
+                    <div class="h-64 w-full relative">
+                        <canvas id="overviewTrendsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bảng 4 nhân vật neo minh họa -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-900">Bảng Đối Chiếu 4 Nhân Vật Neo</h3>
+                            <p class="text-xs text-slate-500">Bảo toàn số liệu kiểm thử thực tế của đề án</p>
+                        </div>
+                        <div class="text-xs text-slate-500">Ngân sách chuẩn: 80.000.000 ₫</div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-50 border-b text-slate-600 font-semibold uppercase">
+                                <tr>
+                                    <th class="p-3">Nhân sự</th>
+                                    <th class="p-3">Bộ phận</th>
+                                    <th class="p-3 text-right">Chỉ tiêu</th>
+                                    <th class="p-3 text-right">Thực đạt</th>
+                                    <th class="p-3 text-right">Tỷ lệ đạt</th>
+                                    <th class="p-3 text-right">Hệ số chi trả</th>
+                                    <th class="p-3 text-right">Khoản thưởng</th>
+                                    <th class="p-3 text-center">Trạng thái xử lý</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overview-anchor-tbody" class="divide-y text-slate-700"></tbody>
+                            <tfoot class="bg-slate-50 font-bold border-t border-slate-200 text-slate-900">
+                                <tr>
+                                    <td colspan="6" class="p-3 text-right">Tổng chi thưởng 4 nhân sự:</td>
+                                    <td class="p-3 text-right text-indigo-700 masked-amount" id="anchor-total-payout">83.800.000 ₫</td>
+                                    <td class="p-3 text-center text-xs text-emerald-600">Khớp 104,8% quỹ</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- VIEW 2: ĐỀ XUẤT MỨC THƯỞNG THÔNG MINH                         -->
+            <!-- ============================================================= -->
+            <div id="view-recommendation" class="view-panel space-y-6 hidden">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- Top Selected Employee Summary Card -->
-                    <div class="bg-white rounded-lg border border-slate-200 p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                    <!-- Cột trái: Chọn nhân sự -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <h3 class="font-bold text-sm text-slate-900">Nhân sự thuộc quyền</h3>
+                            <span class="text-xs text-slate-400" id="rec-team-count">30 nhân sự</span>
+                        </div>
+
+                        <!-- Chọn nhanh 3 nhân vật neo -->
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="selectRecEmployee('EMP-002')" class="p-2 border border-indigo-600 bg-indigo-50 text-indigo-900 font-bold rounded-lg text-xs hover:bg-indigo-100">Bình</button>
+                            <button onclick="selectRecEmployee('EMP-001')" class="p-2 border border-slate-200 bg-slate-50 text-slate-700 font-medium rounded-lg text-xs hover:bg-slate-100">An</button>
+                            <button onclick="selectRecEmployee('EMP-004')" class="p-2 border border-slate-200 bg-slate-50 text-slate-700 font-medium rounded-lg text-xs hover:bg-slate-100">Dũng</button>
+                        </div>
+
+                        <!-- Danh sách nhân viên cuộn -->
+                        <div class="space-y-1 max-h-[420px] overflow-y-auto pr-1" id="rec-employee-list"></div>
+                    </div>
+
+                    <!-- Cột phải: Chi tiết 3 nguồn & Đề xuất -->
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <!-- Header nhân sự được chọn -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div id="rec-detail-avatar" class="w-12 h-12 rounded-full bg-indigo-600 text-white font-bold text-base flex items-center justify-center">
+                                    BI
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-lg font-bold text-slate-900" id="rec-detail-name">Trần Thị Bình</h2>
+                                        <span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700" id="rec-detail-code">MN-008</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5" id="rec-detail-role">Quản lý Tài khoản Khách hàng &bull; Kinh doanh Miền Nam</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-slate-500">Mức đề xuất thông minh:</div>
+                                <div class="text-2xl font-bold text-indigo-600" id="rec-detail-proposed-rate">82,8%</div>
+                                <div class="text-xs font-semibold text-slate-700 masked-amount" id="rec-detail-proposed-amount">16.560.000 ₫</div>
+                            </div>
+                        </div>
+
+                        <!-- 3 Thẻ Nguồn cấu thành (Rất sạch sẽ) -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                                <div class="text-xs font-bold text-slate-500 uppercase">1. Theo Quy Tắc (70%)</div>
+                                <div class="text-xl font-bold text-slate-900" id="rec-card-rule-rate">81,5%</div>
+                                <p class="text-xs text-slate-600" id="rec-card-rule-desc">Từ tỷ lệ đạt có trọng số 94,4% sau duyệt độ khó 0.9.</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                                <div class="text-xs font-bold text-slate-500 uppercase">2. Học Máy (30%)</div>
+                                <div class="text-xl font-bold text-indigo-600" id="rec-card-ml-rate">83,0%</div>
+                                <p class="text-xs text-slate-600" id="rec-card-ml-desc">Dự báo theo mẫu hình 4 kỳ lịch sử. Khoảng [75%, 90%].</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                                <div class="text-xs font-bold text-slate-500 uppercase">3. Đánh Giá Quản Lý</div>
+                                <div class="text-xl font-bold text-emerald-600" id="rec-card-mgr-delta">+0,8%</div>
+                                <p class="text-xs text-slate-600" id="rec-card-mgr-desc">Điểm chấm 4.3/5 sau chuẩn hóa z-score thói quen chấm.</p>
+                            </div>
+                        </div>
+
+                        <!-- Căn cứ giải thích ngắn gọn -->
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                            <h4 class="font-bold text-xs uppercase text-slate-600">Căn cứ tính toán đề xuất</h4>
+                            <div id="rec-explanation-container" class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"></div>
+                        </div>
+
+                        <!-- Thanh kéo mô phỏng mức thưởng What-if -->
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-bold text-xs uppercase text-slate-600">Mô phỏng mức thưởng (What-If)</h4>
+                                    <p class="text-xs text-slate-500">Kéo thử nghiệm để thấy ngay chi phí thay đổi</p>
+                                </div>
+                                <span class="text-base font-bold text-indigo-600" id="whatif-slider-val-display">82,8%</span>
+                            </div>
+
+                            <input type="range" id="whatif-slider" min="0" max="150" value="83" step="1" oninput="handleWhatIfSlider(this.value)" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+
+                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border text-xs">
+                                <div>Khoản thưởng mô phỏng: <strong class="text-slate-900 masked-amount" id="whatif-payout-display">16.560.000 ₫</strong> &bull; Chênh lệch: <strong id="whatif-diff-display">0%</strong></div>
+                                <div id="whatif-l2-badge" class="hidden text-amber-700 bg-amber-50 px-2 py-1 rounded font-semibold border border-amber-200">
+                                    Lệch >10%: Cần duyệt cấp hai
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thao tác Quản lý -->
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-xs text-slate-800">Quyết định của Quản lý:</div>
+                                <div class="text-xs text-slate-500">Chốt mức thưởng hoặc điều chỉnh kèm lý do</div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="openAdjustModal()" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 font-semibold text-xs text-slate-700">Điều chỉnh mức khác</button>
+                                <button onclick="agreeProposedRate()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-xs shadow-sm">Đồng ý mức đề xuất</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- VIEW 3: PHIẾU THƯỞNG NHÂN VIÊN (SLIP)                         -->
+            <!-- ============================================================= -->
+            <div id="view-slip" class="view-panel space-y-6 hidden">
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                    <div class="flex items-center justify-between border-b pb-4">
                         <div class="flex items-center gap-3">
-                            <div id="rec-detail-avatar" class="w-12 h-12 rounded-full bg-teal-800 text-teal-100 font-bold text-base flex items-center justify-center border-2 border-teal-600">
-                                BI
-                            </div>
+                            <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center">BI</div>
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h2 class="text-base font-bold text-slate-900" id="rec-detail-name">Trần Thị Bình</h2>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700" id="rec-detail-code">MN-008</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-50 text-teal-800 border border-teal-200" id="rec-detail-level">Cấp bậc: 3 &bull; Thâm niên: 3.2 năm</span>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-0.5" id="rec-detail-role">Quản lý Tài khoản Khách hàng &bull; Kinh doanh Miền Nam</p>
+                                <h2 class="font-bold text-base text-slate-900" id="slip-emp-name">Trần Thị Bình</h2>
+                                <p class="text-xs text-slate-500" id="slip-emp-meta">Mã NV: MN-008 &bull; Quản lý Khách hàng &bull; Kỳ Q3/2026</p>
                             </div>
                         </div>
+                        <span class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-semibold">Đã duyệt</span>
+                    </div>
 
+                    <!-- Banner tiền thưởng -->
+                    <div class="p-6 rounded-xl bg-slate-900 text-white flex items-center justify-between">
+                        <div>
+                            <div class="text-xs text-slate-400">Khoản thưởng thực nhận kỳ này</div>
+                            <div class="text-3xl font-extrabold mt-1 tracking-tight masked-amount" id="slip-incentive-amount">16.300.000 ₫</div>
+                            <div class="text-xs text-slate-400 mt-1">Mức thưởng mục tiêu: 20.000.000 ₫ &bull; Hệ số chi trả: 81,5%</div>
+                        </div>
                         <div class="text-right">
-                            <div class="text-[11px] text-slate-500 font-medium">Mức đề xuất thông minh:</div>
-                            <div class="text-2xl font-bold text-teal-800" id="rec-detail-proposed-rate">82,8%</div>
-                            <div class="text-xs text-slate-600 font-semibold masked-amount" id="rec-detail-proposed-amount">16.560.000 ₫</div>
+                            <div class="text-xs text-slate-400">Tỷ lệ đạt chỉ tiêu</div>
+                            <div class="text-2xl font-bold mt-1" id="slip-achievement-rate">94,4%</div>
+                            <div class="text-xs text-indigo-300 mt-1">Đã áp dụng độ khó 0.9</div>
                         </div>
                     </div>
 
-                    <!-- 3 Component Sources Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <!-- Source 1: Rule -->
-                        <div class="bg-slate-50 rounded border border-slate-200 p-3.5 flex flex-col justify-between">
-                            <div>
-                                <div class="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-file-invoice text-teal-700"></i> Theo quy tắc (70%)
-                                </div>
-                                <div class="text-lg font-bold text-slate-800 mt-1" id="rec-card-rule-rate">81,5%</div>
-                                <p class="text-[11px] text-slate-600 mt-1" id="rec-card-rule-desc">
-                                    Từ tỷ lệ đạt có trọng số 94,4% sau duyệt hiệu chỉnh độ khó 0.9.
-                                </p>
-                            </div>
-                            <span class="text-[10px] text-slate-400 mt-2 block">Đóng góp nền: <strong>57,1%</strong></span>
-                        </div>
-
-                        <!-- Source 2: ML -->
-                        <div class="bg-slate-50 rounded border border-slate-200 p-3.5 flex flex-col justify-between">
-                            <div>
-                                <div class="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-microchip text-indigo-700"></i> Học máy đề xuất (30%)
-                                </div>
-                                <div class="text-lg font-bold text-slate-800 mt-1" id="rec-card-ml-rate">83,0%</div>
-                                <p class="text-[11px] text-slate-600 mt-1" id="rec-card-ml-desc">
-                                    Dự báo theo mẫu hình 4 kỳ lịch sử. Khoảng [75%, 90%].
-                                </p>
-                            </div>
-                            <span class="text-[10px] text-slate-400 mt-2 block">Đóng góp nền: <strong>24,9%</strong></span>
-                        </div>
-
-                        <!-- Source 3: Manager -->
-                        <div class="bg-slate-50 rounded border border-slate-200 p-3.5 flex flex-col justify-between">
-                            <div>
-                                <div class="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-user-check text-emerald-700"></i> Đánh giá quản lý
-                                </div>
-                                <div class="text-lg font-bold text-slate-800 mt-1" id="rec-card-mgr-delta">+0,8%</div>
-                                <p class="text-[11px] text-slate-600 mt-1" id="rec-card-mgr-desc">
-                                    Điểm chấm 4.3/5 sau chuẩn hóa thiên kiến cá nhân (kẹp [-15%, +15%]).
-                                </p>
-                            </div>
-                            <span class="text-[10px] text-slate-400 mt-2 block">Điều chỉnh thuần: <strong>+0,8%</strong></span>
+                    <!-- Bóc tách công thức -->
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-xs uppercase text-slate-600">Cách tính toán minh bạch</h4>
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+                            <p>&bull; <strong>Chỉ tiêu ban đầu</strong>: 1.000.000.000 ₫ cho 4 gói việc kinh doanh.</p>
+                            <p>&bull; <strong>Hiệu chỉnh thị trường</strong>: Áp dụng hệ số độ khó 0.9 do sức mua Đông Nam Bộ suy giảm 10.2%. Chỉ tiêu sau hiệu chỉnh: <strong>900.000.000 ₫</strong>.</p>
+                            <p>&bull; <strong>Doanh số thực tế</strong>: <strong>850.000.000 ₫</strong> (Đạt <strong>94,44%</strong>).</p>
+                            <p>&bull; <strong>Chi trả theo quy chế</strong>: Hệ số = (94,44% - 70%) / 30% = <strong>81,5%</strong> $\rightarrow$ Tiền thưởng: <strong>16.300.000 ₫</strong>.</p>
                         </div>
                     </div>
 
-                    <!-- Detailed Explanation Text Card -->
-                    <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-                        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-comment-dots text-teal-700"></i> Căn cứ đề xuất chi tiết
-                        </h4>
-                        <div id="rec-explanation-container" class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded border border-slate-200">
-                            <!-- Dynamic Explanation generated by engine -->
-                        </div>
+                    <!-- Khiếu nại -->
+                    <div class="border-t pt-4 flex items-center justify-between">
+                        <div class="text-xs text-slate-500">Cần giải trình thêm? Thời hạn gửi trong vòng 15 ngày làm việc.</div>
+                        <button onclick="openDisputeModal()" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700">Gửi yêu cầu giải trình</button>
                     </div>
+                </div>
+            </div>
 
-                    <!-- What-If Simulation Interactive Slider -->
-                    <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-2">
-                            <div>
-                                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600">Thanh kéo mô phỏng mức thưởng (What-If)</h4>
-                                <p class="text-[11px] text-slate-500">Kéo thử nghiệm để thấy ngay chi phí thay đổi và cảnh báo duyệt cấp hai</p>
-                            </div>
-                            <span class="text-xs font-bold text-teal-800" id="whatif-slider-val-display">82,8%</span>
-                        </div>
-
-                        <input type="range" id="whatif-slider" min="0" max="150" value="83" step="1" oninput="handleWhatIfSlider(this.value)" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-800">
-
-                        <div class="flex justify-between text-[10px] text-slate-400 mt-1">
-                            <span>0% (Sàn)</span>
-                            <span>70% (Bắt đầu thưởng)</span>
-                            <span>100% (Chuẩn chỉ tiêu)</span>
-                            <span>120% (Cận trần)</span>
-                            <span>150% (Trần quy chế)</span>
-                        </div>
-
-                        <!-- What-if Realtime Result Box -->
-                        <div class="mt-3 p-3 bg-teal-50/50 rounded border border-teal-100 flex flex-wrap items-center justify-between text-xs gap-3">
-                            <div>
-                                <span>Khoản thưởng mô phỏng: <strong class="text-teal-900 masked-amount" id="whatif-payout-display">16.560.000 ₫</strong></span>
-                                <span class="mx-2 text-slate-300">|</span>
-                                <span>Chênh lệch so với đề xuất: <strong id="whatif-diff-display">0,0% (0 ₫)</strong></span>
-                            </div>
-                            <div id="whatif-l2-badge" class="hidden text-[11px] font-semibold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded border border-amber-300">
-                                <i class="fa-solid fa-triangle-exclamation"></i> Lệch >10%: Bắt buộc duyệt cấp hai
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Manager Q&A Frame (Khung hỏi đáp cho Quản lý) -->
-                    <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-2.5">
-                            <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle-question text-teal-700"></i> Khung hỏi đáp cho Quản lý (Trích xuất từ dữ liệu thật)
-                            </h4>
-                            <span class="text-[10px] text-slate-400">Không bịa số &bull; 100% minh bạch</span>
-                        </div>
-
-                        <!-- Suggestion Question Buttons -->
-                        <div class="flex flex-wrap gap-1.5 mb-3">
-                            <button onclick="askQuestion('why_this_rate')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition">
-                                Vì sao đề xuất mức này?
-                            </button>
-                            <button onclick="askQuestion('what_if_adjust')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition">
-                                Nếu hạ xuống 60% thì thay đổi gì?
-                            </button>
-                            <button onclick="askQuestion('peer_comparison')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition">
-                                So với đồng nghiệp cùng vị trí?
-                            </button>
-                            <button onclick="askQuestion('promotion_check')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition">
-                                Có nên cân nhắc thăng tiến không?
-                            </button>
-                        </div>
-
-                        <!-- Q&A Answer Display -->
-                        <div id="qa-answer-box" class="bg-slate-50 border border-slate-200 rounded p-3.5 text-xs text-slate-700 leading-relaxed min-h-[70px]">
-                            Bấm chọn một câu hỏi gợi ý phía trên để xem diễn giải số liệu chi tiết.
-                        </div>
-                    </div>
-
-                    <!-- Manager Decision Action Bar -->
-                    <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex items-center justify-between">
+            <!-- ============================================================= -->
+            <!-- VIEW 4: DANH MỤC NHÂN VIÊN                                    -->
+            <!-- ============================================================= -->
+            <div id="view-employees" class="view-panel space-y-6 hidden">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-200 flex items-center justify-between">
                         <div>
-                            <div class="text-xs font-bold text-slate-800">Quyết định của Quản lý trực tiếp:</div>
-                            <div class="text-[11px] text-slate-500">Chọn đồng ý đề xuất hoặc điều chỉnh mức khác kèm giải trình</div>
+                            <h2 class="font-bold text-lg text-slate-900">Danh Mục Nhân Sự & Chỉ Tiêu</h2>
+                            <p class="text-xs text-slate-500">Theo dõi tiến độ hoàn thành chỉ tiêu toàn bộ nhân viên</p>
                         </div>
-
-                        <div class="flex items-center gap-2.5">
-                            <button onclick="openAdjustModal()" class="px-3.5 py-2 border border-slate-300 text-slate-700 font-semibold rounded text-xs hover:bg-slate-100 transition">
-                                Điều chỉnh mức khác
-                            </button>
-                            <button onclick="agreeProposedRate()" class="px-4 py-2 bg-teal-800 text-white font-semibold rounded text-xs hover:bg-teal-900 transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-check"></i> Đồng ý mức đề xuất
-                            </button>
-                        </div>
+                        <input type="text" oninput="handleEmployeeSearch(this.value)" placeholder="Tìm kiếm theo tên hoặc mã NV..." class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs w-64 bg-slate-50">
                     </div>
-
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-50 border-b text-slate-600 font-semibold uppercase">
+                                <tr>
+                                    <th class="p-3">Mã NV</th>
+                                    <th class="p-3">Họ và tên</th>
+                                    <th class="p-3">Phòng ban</th>
+                                    <th class="p-3">Vị trí</th>
+                                    <th class="p-3 text-right">Chỉ tiêu</th>
+                                    <th class="p-3 text-right">Thực đạt</th>
+                                    <th class="p-3 text-right">Tỷ lệ đạt</th>
+                                    <th class="p-3 text-right">Khoản thưởng</th>
+                                    <th class="p-3 text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employees-table-tbody" class="divide-y text-slate-700"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- ============================================================= -->
-        <!-- TAB 3: BẢN GIẢI TRÌNH NHÂN VIÊN (VIEW: SLIP / MY-SLIP)         -->
-        <!-- ============================================================= -->
-        <section id="view-slip" class="view-panel p-6 space-y-5 hidden">
-            <div class="max-w-3xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm p-6 space-y-6">
-                
-                <!-- Slip Header -->
-                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-teal-800 text-white font-bold text-base flex items-center justify-center">
-                            BI
-                        </div>
+            <!-- ============================================================= -->
+            <!-- VIEW 5: KIỂM TRA DỮ LIỆU                                      -->
+            <!-- ============================================================= -->
+            <div id="view-validation" class="view-panel space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b pb-3">
                         <div>
-                            <h2 class="text-base font-bold text-slate-900" id="slip-emp-name">Trần Thị Bình</h2>
-                            <p class="text-xs text-slate-500" id="slip-emp-meta">Mã NV: MN-008 &bull; Quản lý Tài khoản Khách hàng &bull; Kỳ Q3/2026</p>
+                            <h2 class="font-bold text-lg text-slate-900">Kiểm Tra Lỗi Dữ Liệu & Bất Thường</h2>
+                            <p class="text-xs text-slate-500">Rà soát trùng lặp hợp đồng và số liệu bất thường trước khi duyệt thưởng</p>
                         </div>
+                        <span class="px-3 py-1 bg-amber-50 text-amber-800 font-bold rounded-full text-xs border border-amber-200">5 trường hợp cần xử lý</span>
                     </div>
-                    <div class="text-right">
-                        <span class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            <i class="fa-solid fa-circle-check"></i> Đã phê duyệt chính thức
-                        </span>
-                    </div>
-                </div>
 
-                <!-- Slip Amount Banner -->
-                <div class="bg-gradient-to-r from-teal-900 to-teal-800 text-white rounded-lg p-5 flex items-center justify-between">
-                    <div>
-                        <div class="text-xs text-teal-200 uppercase font-medium">Khoản thưởng thực nhận kỳ này</div>
-                        <div class="text-3xl font-extrabold mt-1 tracking-tight masked-amount" id="slip-incentive-amount">16.300.000 ₫</div>
-                        <div class="text-xs text-teal-200/80 mt-1">Mức thưởng mục tiêu: 20.000.000 ₫ &bull; Hệ số chi trả: 81,5%</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-teal-200">Tỷ lệ đạt chỉ tiêu có trọng số</div>
-                        <div class="text-2xl font-bold mt-1" id="slip-achievement-rate">94,4%</div>
-                        <div class="text-[11px] text-teal-200/80 mt-1">Đã áp dụng độ khó thị trường 0.9</div>
-                    </div>
-                </div>
-
-                <!-- Neutral & Respectful Explanation -->
-                <div class="space-y-2">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-600">Cách tính toán minh bạch</h3>
-                    <div class="bg-slate-50 border border-slate-200 rounded p-4 text-xs text-slate-700 leading-relaxed space-y-2">
-                        <p>
-                            - <strong>Chỉ tiêu ban đầu</strong>: 1.000.000.000 ₫ phân bổ cho 4 gói việc kinh doanh.
-                        </p>
-                        <p>
-                            - <strong>Hiệu chỉnh khách quan</strong>: Hội đồng xét duyệt đã thông qua đề xuất của Quản lý trực tiếp, áp dụng <strong>Hệ số độ khó 0.9</strong> do tác động của sức mua thị trường vùng Đông Nam Bộ co hẹp 10.2%. Chỉ tiêu sau hiệu chỉnh là <strong>900.000.000 ₫</strong>.
-                        </p>
-                        <p>
-                            - <strong>Doanh số nghiệm thu thực tế</strong>: <strong>850.000.000 ₫</strong>, tương ứng tỷ lệ đạt chỉ tiêu có trọng số là <strong>94,44%</strong>.
-                        </p>
-                        <p>
-                            - <strong>Hệ số chi trả theo quy chế</strong>: Tuyến tính từ ngưỡng 70% lên 100%:
-                            $$\text{Hệ số} = \frac{94,44\% - 70\%}{100\% - 70\%} \times 1,0 = 0,8148 \approx 81,5\%$$
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Dispute / Explanation Request Form -->
-                <div class="border-t border-slate-200 pt-4 flex items-center justify-between">
-                    <div>
-                        <div class="text-xs font-semibold text-slate-800">Cần hỗ trợ giải trình hoặc gửi khiếu nại?</div>
-                        <div class="text-[11px] text-slate-500">Thời hạn tiếp nhận phản hồi trong vòng 15 ngày làm việc kể từ ngày công bố.</div>
-                    </div>
-                    <button onclick="openDisputeModal()" class="px-3.5 py-2 border border-slate-300 hover:bg-slate-50 rounded text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-pen-to-square"></i> Gửi yêu cầu giải trình
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============================================================= -->
-        <!-- TAB 4: DANH MỤC NHÂN VIÊN (VIEW: EMPLOYEES)                    -->
-        <!-- ============================================================= -->
-        <section id="view-employees" class="view-panel p-6 space-y-4 hidden">
-            <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex items-center justify-between">
-                <div>
-                    <h2 class="font-bold text-sm text-slate-900">Danh mục Nhân sự & Chỉ tiêu</h2>
-                    <p class="text-xs text-slate-500">Tra cứu thông tin, chỉ tiêu và tiến độ của toàn bộ nhân sự theo thẩm quyền</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                        <input type="text" id="emp-search-input" oninput="handleEmployeeSearch(this.value)" placeholder="Tìm theo tên hoặc mã NV..." class="text-xs pl-8 pr-3 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-teal-700 w-64 bg-slate-50">
-                    </div>
+                    <div class="space-y-4" id="validation-queue-cards"></div>
                 </div>
             </div>
 
-            <!-- Table Container -->
-            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-                <table class="w-full text-xs text-left border-collapse">
-                    <thead class="bg-slate-100 text-slate-600 uppercase font-semibold border-b border-slate-200">
-                        <tr>
-                            <th class="py-2.5 px-3">Mã NV</th>
-                            <th class="py-2.5 px-3">Họ và tên</th>
-                            <th class="py-2.5 px-3">Phòng ban</th>
-                            <th class="py-2.5 px-3">Vị trí & Cấp bậc</th>
-                            <th class="py-2.5 px-3 text-right">Chỉ tiêu (M)</th>
-                            <th class="py-2.5 px-3 text-right">Thực đạt (M)</th>
-                            <th class="py-2.5 px-3 text-right">Tỷ lệ đạt</th>
-                            <th class="py-2.5 px-3 text-right">Khoản thưởng</th>
-                            <th class="py-2.5 px-3 text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="employees-table-tbody" class="divide-y divide-slate-100">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ============================================================= -->
-        <!-- TAB 5: KIỂM TRA DỮ LIỆU (VIEW: VALIDATION)                     -->
-        <!-- ============================================================= -->
-        <section id="view-validation" class="view-panel p-6 space-y-4 hidden">
-            <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm flex items-center justify-between">
-                <div>
-                    <h2 class="font-bold text-sm text-slate-900">Hàng đợi Kiểm tra & Toàn vẹn Dữ liệu</h2>
-                    <p class="text-xs text-slate-500">Phát hiện bất thường số học, trùng lặp hợp đồng và thiếu thông tin trước khi tính thưởng</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-semibold px-2.5 py-1 bg-amber-50 text-amber-800 rounded border border-amber-200" id="validation-total-badge">
-                        5 trường hợp cần xử lý
-                    </span>
-                </div>
-            </div>
-
-            <div class="space-y-3" id="validation-queue-cards">
-                <!-- Populated by JS: Dũng duplicate card + generic anomalies -->
-            </div>
-        </section>
-
-        <!-- ============================================================= -->
-        <!-- TAB 6: TÍNH THƯỞNG VÀ CHI TRẢ (VIEW: PAYROLL)                  -->
-        <!-- ============================================================= -->
-        <section id="view-payroll" class="view-panel p-6 space-y-4 hidden">
-            <div class="bg-white rounded-lg border border-slate-200 p-5 shadow-sm flex items-center justify-between">
-                <div>
-                    <h2 class="font-bold text-sm text-slate-900">Phê duyệt Lô & Xuất Bảng Chi trả (Payroll)</h2>
-                    <p class="text-xs text-slate-500">Kiểm tra ngân sách toàn công ty và xuất dữ liệu sang phòng Kế toán / Tài chính</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="openPayrollExportModal()" class="px-4 py-2 bg-teal-800 text-white text-xs font-bold rounded hover:bg-teal-900 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-export"></i> Xuất file Payroll CSV
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg border border-slate-200 p-5 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                        <span class="text-slate-500">Tổng ngân sách quỹ:</span>
-                        <div class="text-lg font-bold text-slate-900 mt-1 masked-amount">1.750.000.000 ₫</div>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                        <span class="text-slate-500">Tổng chi thưởng phê duyệt:</span>
-                        <div class="text-lg font-bold text-teal-800 mt-1 masked-amount" id="payroll-total-approved">1.710.450.000 ₫</div>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
-                        <span class="text-slate-500">Tỷ lệ sử dụng quỹ:</span>
-                        <div class="text-lg font-bold text-emerald-700 mt-1" id="payroll-utilization">97,7% (Hợp lệ)</div>
-                    </div>
-                </div>
-
-                <div class="p-4 bg-teal-50/60 rounded border border-teal-200 text-xs text-teal-950 flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa-solid fa-circle-check text-teal-700 text-base"></i>
+            <!-- ============================================================= -->
+            <!-- VIEW 6: TÍNH THƯỞNG VÀ CHI TRẢ                                -->
+            <!-- ============================================================= -->
+            <div id="view-payroll" class="view-panel space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                    <div class="flex items-center justify-between border-b pb-4">
                         <div>
-                            <strong>Toàn bộ 120 hồ sơ đã sẵn sàng xuất chi trả</strong>
-                            <p class="text-[11px] text-teal-800 mt-0.5">Không còn bản ghi treo cảnh báo hoặc chưa chốt thẩm quyền.</p>
+                            <h2 class="font-bold text-lg text-slate-900">Phê Duyệt Lô & Xuất Bảng Chi Trả</h2>
+                            <p class="text-xs text-slate-500">Đối chiếu ngân sách và xuất file CSV sang phòng Kế toán / Tài chính</p>
+                        </div>
+                        <button onclick="openPayrollExportModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-export"></i> Xuất file Payroll CSV
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="p-4 bg-slate-50 rounded-xl border">
+                            <div class="text-xs text-slate-500">Tổng ngân sách quỹ:</div>
+                            <div class="text-xl font-bold text-slate-900 mt-1 masked-amount">1.750.000.000 ₫</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border">
+                            <div class="text-xs text-slate-500">Tổng chi thưởng phê duyệt:</div>
+                            <div class="text-xl font-bold text-indigo-700 mt-1 masked-amount" id="payroll-total-approved">1.710.450.000 ₫</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border">
+                            <div class="text-xs text-slate-500">Tình trạng quỹ:</div>
+                            <div class="text-xl font-bold text-emerald-600 mt-1">97,7% (An toàn)</div>
                         </div>
                     </div>
-                    <span class="px-2.5 py-1 bg-teal-800 text-white font-bold rounded text-[11px]">SẴN SÀNG</span>
+
+                    <div class="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between">
+                        <span><i class="fa-solid fa-check mr-2 text-emerald-600"></i>Toàn bộ 120 hồ sơ đã hoàn tất phê duyệt và sẵn sàng xuất chi trả.</span>
+                        <span class="font-bold">120/120 BẢN GHI</span>
+                    </div>
                 </div>
             </div>
-        </section>
 
+        </div>
     </main>
 
-    <!-- ============================================================= -->
-    <!-- MODALS: CÁCH TÍNH, ĐIỀU CHỈNH, XÁC NHẬN, XUẤT PAYROLL         -->
-    <!-- ============================================================= -->
-
-    <!-- Modal 1: Cách tính (Formula Popover Modal) -->
-    <div id="modal-formula" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-lg w-full p-5 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center gap-2 text-teal-800 font-bold text-sm">
-                    <i class="fa-solid fa-calculator"></i>
-                    <span id="formula-modal-title">Cách tính chỉ số</span>
-                </div>
-                <button onclick="closeFormulaModal()" class="text-slate-400 hover:text-slate-600 text-sm">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- MODALS -->
+    <!-- Modal Cách tính -->
+    <div id="modal-formula" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="font-bold text-base text-slate-900" id="formula-modal-title">Cách tính chỉ số</h3>
+                <button onclick="closeFormulaModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <div id="formula-modal-body" class="text-xs text-slate-700 space-y-3 leading-relaxed">
-                <!-- Populated dynamically with real numbers -->
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 text-right">
-                <button onclick="closeFormulaModal()" class="px-3.5 py-1.5 bg-slate-800 text-white rounded text-xs font-semibold hover:bg-slate-700">
-                    Đã hiểu
-                </button>
+            <div id="formula-modal-body" class="text-xs text-slate-700 space-y-3 leading-relaxed"></div>
+            <div class="text-right pt-2 border-t">
+                <button onclick="closeFormulaModal()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold">Đóng</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal 2: Quản lý điều chỉnh mức thưởng -->
-    <div id="modal-adjust-rate" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full p-5 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-sm text-slate-900">Điều chỉnh Mức Thưởng Cuối</h3>
-                <button onclick="closeAdjustModal()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- Modal Điều chỉnh của Quản lý -->
+    <div id="modal-adjust-rate" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="font-bold text-base text-slate-900">Điều Chỉnh Mức Thưởng</h3>
+                <button onclick="closeAdjustModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="font-semibold text-slate-700 block mb-1">Mức thưởng mong muốn (%):</label>
-                    <input type="number" id="input-adjust-rate" min="0" max="150" value="83" class="w-full border border-slate-300 rounded px-3 py-2 text-xs font-bold text-teal-900 bg-slate-50 focus:ring-1 focus:ring-teal-700">
+                    <input type="number" id="input-adjust-rate" min="0" max="150" value="83" class="w-full border rounded-lg p-2 font-bold text-indigo-700 bg-slate-50">
                     <span class="text-[11px] text-slate-500 mt-1 block">Mức đề xuất hiện tại: <strong id="adjust-modal-rec-val">82,8%</strong></span>
                 </div>
-
                 <div>
-                    <label class="font-semibold text-slate-700 block mb-1">Lý do điều chỉnh (Bắt buộc nếu lệch quá 10 điểm):</label>
-                    <textarea id="input-adjust-reason" rows="3" placeholder="Nhập căn cứ nghiệp vụ cụ thể cho quyết định điều chỉnh này..." class="w-full border border-slate-300 rounded p-2 text-xs text-slate-700 bg-slate-50 focus:ring-1 focus:ring-teal-700"></textarea>
-                </div>
-
-                <div id="adjust-modal-warning" class="hidden p-2.5 bg-amber-50 text-amber-800 rounded border border-amber-200 text-[11px]">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Mức điều chỉnh lệch quá 10% so với đề xuất. Quyết định sẽ chuyển sang Hội đồng Admin phê duyệt cấp hai.
+                    <label class="font-semibold text-slate-700 block mb-1">Lý do điều chỉnh (Bắt buộc nếu lệch >10%):</label>
+                    <textarea id="input-adjust-reason" rows="3" placeholder="Nhập lý do cụ thể..." class="w-full border rounded-lg p-2 bg-slate-50"></textarea>
                 </div>
             </div>
-
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button onclick="closeAdjustModal()" class="px-3 py-1.5 border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-50">
-                    Hủy bỏ
-                </button>
-                <button onclick="submitAdjustRate()" class="px-3.5 py-1.5 bg-teal-800 text-white rounded text-xs font-semibold hover:bg-teal-900">
-                    Xác nhận điều chỉnh
-                </button>
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button onclick="closeAdjustModal()" class="px-3 py-1.5 border rounded-lg text-xs font-medium text-slate-700">Hủy</button>
+                <button onclick="submitAdjustRate()" class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold">Xác nhận</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal 3: Xác nhận Duyệt Hàng loạt Tối ưu Cơ chế Thưởng -->
-    <div id="modal-bulk-confirm" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-lg w-full p-5 space-y-4">
-            <div class="flex items-center gap-2 text-teal-800 font-bold text-sm border-b border-slate-100 pb-3">
-                <i class="fa-solid fa-shield-check text-base"></i>
-                <span>Xác nhận Duyệt Hàng loạt Đề xuất Tối ưu</span>
-            </div>
-
-            <div class="text-xs text-slate-700 space-y-2.5 leading-relaxed">
-                <p>Bạn đang thực hiện thao tác duyệt đồng thời <strong>3 đề xuất tối ưu chính sách</strong>:</p>
-                <ul class="list-disc pl-5 space-y-1 text-slate-600">
-                    <li>Hiệu chỉnh hệ số độ khó 0.9 vùng Đông Nam Bộ (+6,3M ₫)</li>
-                    <li>Giảm độ dốc vùng dồn ứ 95% - 99% (-12,5M ₫)</li>
-                    <li>Gán trọng số riêng cho dự án dài hạn B2B (+0,0M ₫)</li>
-                </ul>
-                <div class="p-3 bg-amber-50 rounded border border-amber-200 text-[11px] text-amber-900">
-                    <strong>Hệ quả tài chính:</strong> Tổng ngân sách điều chỉnh ròng là <strong>-6.200.000 ₫</strong>. Quyết định sẽ được ghi vào nhật ký kiểm toán không thể xóa. Bạn có quyền hoàn tác trong vòng <strong>5 phút</strong> sau khi bấm xác nhận.
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button onclick="closeBulkConfirmModal()" class="px-3 py-1.5 border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-50">
-                    Hủy
-                </button>
-                <button onclick="executeBulkApproval()" class="px-4 py-1.5 bg-teal-800 text-white rounded text-xs font-bold hover:bg-teal-900">
-                    Xác nhận duyệt ngay
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 4: Xuất Payroll CSV -->
-    <div id="modal-payroll-export" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg border border-slate-200 shadow-xl max-w-md w-full p-5 space-y-4">
-            <div class="flex items-center gap-2 text-teal-800 font-bold text-sm border-b border-slate-100 pb-3">
-                <i class="fa-solid fa-file-csv text-base"></i>
-                <span>Xuất Bảng Chi trả Sang Kế toán</span>
-            </div>
-
+    <!-- Modal Duyệt hàng loạt -->
+    <div id="modal-bulk-confirm" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-base text-slate-900 border-b pb-3">Xác nhận Duyệt Hàng Loạt Đề Xuất</h3>
             <div class="text-xs text-slate-700 space-y-2">
-                <p>Hệ thống sẽ kết xuất tệp tin <code>PAYROLL_Q3_2026_FINAL.csv</code> gồm <strong>120 nhân sự</strong> đã phê duyệt chính thức.</p>
-                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded text-[11px] space-y-1 text-slate-600">
-                    <div>&bull; Kỳ chốt: <strong>Q3/2026</strong></div>
-                    <div>&bull; Tổng số tiền chi: <strong class="text-teal-900 masked-amount">1.710.450.000 ₫</strong></div>
-                    <div>&bull; Người xuất: <strong>Nguyễn Thu Trang (Admin C&B)</strong></div>
+                <p>Bạn đang duyệt đồng thời 3 đề xuất tối ưu chính sách. Quyết định có thể hoàn tác trong vòng <strong>5 phút</strong> sau khi duyệt.</p>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button onclick="closeBulkConfirmModal()" class="px-3 py-1.5 border rounded-lg text-xs">Hủy</button>
+                <button onclick="executeBulkApproval()" class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Xuất Payroll CSV -->
+    <div id="modal-payroll-export" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-base text-slate-900 border-b pb-3">Xuất File Chi Trả Kế Toán</h3>
+            <div class="text-xs text-slate-700 space-y-2">
+                <p>Tệp tin <code>PAYROLL_Q3_2026_FINAL.csv</code> bao gồm 120 nhân sự đã duyệt.</p>
+                <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+                    <div>Tổng số tiền chi trả: <strong class="text-indigo-700 masked-amount">1.710.450.000 ₫</strong></div>
+                    <div>Người xuất: <strong>Nguyễn Thu Trang (Admin C&B)</strong></div>
                 </div>
             </div>
-
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button onclick="closePayrollExportModal()" class="px-3 py-1.5 border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-50">
-                    Đóng
-                </button>
-                <button onclick="executeDownloadPayrollCSV()" class="px-4 py-1.5 bg-teal-800 text-white rounded text-xs font-bold hover:bg-teal-900 flex items-center gap-1.5">
-                    <i class="fa-solid fa-download"></i> Tải file CSV
-                </button>
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button onclick="closePayrollExportModal()" class="px-3 py-1.5 border rounded-lg text-xs">Đóng</button>
+                <button onclick="executeDownloadPayrollCSV()" class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold">Tải file CSV</button>
             </div>
         </div>
     </div>
