@@ -271,3 +271,10 @@ body.privacy-masked .masked-amount {
     max-width: 100%;
   }
 }
+
+/* Tránh header bị dồn chữ khi cửa sổ ứng dụng ở kích thước laptop. */
+@media (max-width: 1200px) {
+  #page-subtitle {
+    display: none;
+  }
+}

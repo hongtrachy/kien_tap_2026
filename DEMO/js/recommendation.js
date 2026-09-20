@@ -173,15 +173,15 @@
     const mlAbsPoints = Math.abs(mlDiffPoints).toFixed(1);
 
     // Nhận xét quản lý
-    const mgrSign = deltaManager >= 0 ? 'cộng thêm' : 'trừ đi';
+    const mgrSign = deltaManager >= 0 ? 'cộng' : 'trừ';
     const mgrAbsPoints = Math.abs(deltaManager * 100).toFixed(1);
     const highestCriterion = getHighestCriterionText(normEval.details);
 
-    return `Hệ thống đề xuất mức thưởng <strong>${rProposedPercent}</strong> kết hợp từ 3 nguồn:<br><br>` +
-      `1. <strong>Theo quy tắc:</strong> Tỷ lệ đạt có trọng số của các gói việc đạt <strong>${wRatePercent}</strong>, tương ứng hệ số chi trả <strong>${rRulePercent}</strong> theo quy chế.<br>` +
-      `2. <strong>Theo học máy:</strong> Phân tích 4 kỳ trước cho thấy phong độ ổn định; học máy dự báo mức tham chiếu ${Engine.formatPercent(rML, 1)} (${mlSign} ${mlAbsPoints} điểm phần trăm).<br>` +
-      `3. <strong>Theo quản lý:</strong> Đánh giá bình quân ${normEval.rawScore}/5,0 (trong đó tiêu chí ${highestCriterion} nổi bật), quy đổi ${mgrSign} ${mgrAbsPoints} điểm phần trăm sau chuẩn hóa.<br><br>` +
-      `Mức đề xuất nằm an toàn trong dải linh động cho phép.`;
+    return `Mức thưởng đề xuất <strong>${rProposedPercent}</strong> được tổng hợp từ 3 cơ sở thực tế:<br><br>` +
+      `&bull; <strong>Quy chế công ty (70%):</strong> Doanh số nghiệm thu đạt <strong>${wRatePercent}</strong> chỉ tiêu có trọng số, tương ứng hệ số chi trả <strong>${rRulePercent}</strong>.<br>` +
+      `&bull; <strong>Tham chiếu lịch sử (30%):</strong> Dữ liệu 4 kỳ gần nhất dự báo mức trung bình ${Engine.formatPercent(rML, 1)} (${mlSign} ${mlAbsPoints}% so với kỳ này).<br>` +
+      `&bull; <strong>Đánh giá của quản lý:</strong> Điểm đánh giá trực tiếp đạt ${normEval.rawScore}/5,0 (điểm mạnh: ${highestCriterion}), quy đổi điều chỉnh ${mgrSign} ${mgrAbsPoints}%.<br><br>` +
+      `<span class="text-slate-500">Mức đề xuất đảm bảo sự công bằng, nằm trong khung ngân sách cho phép của bộ phận.</span>`;
   }
 
   function getHighestCriterionText(details = {}) {
@@ -264,6 +264,7 @@
 
   const SmartRecommendationEngine = {
     loadMLPredictions,
+    setPredictionsCache: (cache) => { mlPredictionsCache = cache; },
     computeEmployeeRecommendation,
     answerManagerQuestion
   };

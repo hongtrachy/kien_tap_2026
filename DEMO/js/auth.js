@@ -18,6 +18,7 @@
   const SAMPLE_ACCOUNTS = {
     admin: {
       username: 'admin',
+      demoPassword: '123456',
       name: 'Nguyễn Thu Trang',
       role: 'admin',
       roleName: 'Quản trị viên (Admin C&B & Tài chính)',
@@ -28,6 +29,7 @@
     },
     manager: {
       username: 'manager',
+      demoPassword: '123456',
       name: 'Trần Minh Đức',
       role: 'manager',
       roleName: 'Quản lý Trực tiếp (Trưởng phòng KD Miền Nam)',
@@ -39,6 +41,7 @@
     },
     employee: {
       username: 'employee',
+      demoPassword: '123456',
       name: 'Trần Thị Bình',
       role: 'employee',
       roleName: 'Nhân viên (EMP-002)',
@@ -64,8 +67,7 @@
     } catch (e) {
       console.warn('Lỗi đọc session auth:', e);
     }
-    // Mặc định ban đầu đăng nhập Admin để demo tiện nhất
-    return SAMPLE_ACCOUNTS.admin;
+    return null;
   }
 
   /**
@@ -73,7 +75,7 @@
    */
   function login(username, password) {
     const user = SAMPLE_ACCOUNTS[username];
-    if (user) {
+    if (user && password === user.demoPassword) {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(user));
       return { success: true, user };
     }
