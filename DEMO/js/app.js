@@ -215,10 +215,11 @@
     const wRateEl = document.getElementById('metric-weighted-rate');
     if (wRateEl) wRateEl.textContent = IncentiveEngine.formatPercent(metrics.avgWeightedRate, 1);
 
+    const interimToDate = Math.round(metrics.totalIncentive * metrics.progressVsTime);
     const interimEl = document.getElementById('metric-interim-amount');
     const projEl = document.getElementById('metric-projected-amount');
-    if (interimEl) interimEl.textContent = IncentiveEngine.formatVND(metrics.totalIncentive);
-    if (projEl) projEl.textContent = IncentiveEngine.formatVND(Math.round(metrics.totalIncentive * (1 + (1 - metrics.progressVsTime) * 0.1)));
+    if (interimEl) interimEl.textContent = IncentiveEngine.formatVND(interimToDate);
+    if (projEl) projEl.textContent = IncentiveEngine.formatVND(metrics.totalIncentive);
 
     const budUsageEl = document.getElementById('metric-budget-usage');
     if (budUsageEl) budUsageEl.textContent = IncentiveEngine.formatPercent(metrics.budgetUsageRate, 1);
@@ -227,7 +228,6 @@
     if (timeProgEl) timeProgEl.textContent = IncentiveEngine.formatPercent(metrics.progressVsTime, 1);
 
     renderOverviewChart();
-    renderAnchorPersonasTable();
   }
 
   function renderOverviewChart() {
@@ -772,7 +772,7 @@
           </div>
           <h4 class="font-bold text-sm text-slate-900 mt-2">Hợp đồng HĐ-RET-099 trị giá 90.000.000 ₫ bị nhập 2 lần</h4>
           <p class="text-xs text-slate-600 mt-1">
-            Ghi nhận doanh số thô 990M ₫ khiến thưởng vọt lên 25M ₫. Thực đạt đúng sau khấu trừ là 900M ₫ (100% $\\rightarrow$ Thưởng 20M ₫).
+            Ghi nhận doanh số thô 990M ₫ khiến thưởng vọt lên 25M ₫. Thực đạt đúng sau khấu trừ là 900M ₫ (100% → Thưởng 20M ₫).
           </p>
         </div>
         <div>
@@ -794,7 +794,6 @@
     dung.status = 'CALCULATED';
 
     renderValidationQueue();
-    renderAnchorPersonasTable();
     showToast('Đã khấu trừ hợp đồng trùng 90M ₫ của Phạm Tiến Dũng.');
   };
 
@@ -835,46 +834,44 @@
     showToast('Đã tải xuống PAYROLL_Q3_2026_FINAL.csv thành công!');
   };
 
-  // Modal Cách tính
+  // Modal Cách tính (Diễn giải tự nhiên, dễ hiểu, không công thức khó nhìn)
   window.openFormulaModal = function (metricKey) {
     const modal = document.getElementById('modal-formula');
     const titleEl = document.getElementById('formula-modal-title');
     const bodyEl = document.getElementById('formula-modal-body');
 
     if (metricKey === 'weighted_rate') {
-      titleEl.textContent = 'Cách tính: Tỷ lệ đạt chỉ tiêu có trọng số';
+      titleEl.textContent = 'Ý nghĩa: Tỷ lệ đạt chỉ tiêu có trọng số';
       bodyEl.innerHTML = `
-        <p><strong>Công thức:</strong></p>
-        <div class="p-2.5 bg-slate-100 rounded font-mono text-xs">
-          R_thực_đạt_w = Tổng(Trọng_số_i × Tỷ_lệ_đạt_i) / Tổng(Trọng_số_i)
-        </div>
-        <p class="text-slate-600">
-          Mỗi gói việc i có <code>Trọng_số_i = Quy_mô_gói × Độ_phức_tạp</code>. Tỷ lệ bình quân toàn công ty kỳ này đạt <strong>98,5%</strong>.
+        <p class="text-slate-700 leading-relaxed">
+          Tỷ lệ này phản ánh mức độ hoàn thành công việc thực tế của nhân sự, trong đó mỗi gói hợp đồng được nhân với hệ số quy mô và độ phức tạp tương ứng thay vì chia cào bằng.
+        </p>
+        <p class="text-slate-600 mt-2">
+          Hiện tại toàn công ty đạt trung bình <strong>94,6%</strong> chỉ tiêu được giao.
         </p>
       `;
     } else if (metricKey === 'interim_incentive') {
-      titleEl.textContent = 'Cách tính: Thưởng tạm tính đến ngày';
+      titleEl.textContent = 'Ý nghĩa: Thưởng tạm tính đến ngày';
       bodyEl.innerHTML = `
-        <p><strong>Công thức:</strong></p>
-        <div class="p-2.5 bg-slate-100 rounded font-mono text-xs">
-          Thưởng_tạm_tính = Thưởng_mục_tiêu × Đường_cong_chi_trả(Tỷ_lệ_lũy_kế_đến_ngày)
-        </div>
-        <p class="text-slate-600">
-          Tính đến ngày 15/22 (Tuần 3), toàn công ty đạt <strong>1.642.500.000 ₫</strong>.
+        <p class="text-slate-700 leading-relaxed">
+          Ước tính số tiền thưởng nhân viên đã tích lũy tương ứng với tiến độ làm việc tính đến ngày hiện tại trong tháng.
+        </p>
+        <p class="text-slate-600 mt-2">
+          Tính đến ngày công 15/22 (Tuần 3), quỹ thưởng đã tích lũy đạt khoảng <strong>1,30 tỷ ₫</strong> và dự phóng kết thúc kỳ sẽ đạt <strong>1,90 tỷ ₫</strong> nếu duy trì tốc độ này.
         </p>
       `;
     } else if (metricKey === 'budget_usage') {
-      titleEl.textContent = 'Cách tính: Chi phí so với Quỹ';
+      titleEl.textContent = 'Ý nghĩa: Chi phí so với Quỹ thưởng';
       bodyEl.innerHTML = `
-        <p class="text-slate-600">
-          Tổng chi dự kiến 1.710.450.000 ₫ / Ngân sách quỹ 1.750.000.000 ₫ = <strong>97,7%</strong> (Nằm trong hạn mức an toàn).
+        <p class="text-slate-700 leading-relaxed">
+          So sánh tổng chi phí thưởng dự kiến với hạn mức ngân sách <strong>1,75 tỷ ₫</strong> đã được Hội đồng quản trị phê duyệt cho kỳ Q3/2026.
         </p>
       `;
     } else if (metricKey === 'time_progress') {
-      titleEl.textContent = 'Cách tính: Tiến độ thời gian';
+      titleEl.textContent = 'Ý nghĩa: Tiến độ thời gian';
       bodyEl.innerHTML = `
-        <p class="text-slate-600">
-          Đã qua 15/22 ngày làm việc trong tháng (68,2%). Tốc độ hoàn thành: 98,5% / 68,2% = <strong>1.02x</strong>.
+        <p class="text-slate-700 leading-relaxed">
+          Đã đi qua <strong>15 trên tổng số 22 ngày làm việc</strong> tiêu chuẩn trong tháng (tương đương 68,2% chu kỳ thời gian).
         </p>
       `;
     }

@@ -269,41 +269,6 @@
                     </div>
                 </div>
 
-                <!-- Bảng 4 nhân vật neo minh họa -->
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-200 flex items-center justify-between">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-900">Bảng Đối Chiếu 4 Nhân Vật Neo</h3>
-                            <p class="text-xs text-slate-500">Bảo toàn số liệu kiểm thử thực tế của đề án</p>
-                        </div>
-                        <div class="text-xs text-slate-500">Ngân sách chuẩn: 80.000.000 ₫</div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-50 border-b text-slate-600 font-semibold uppercase">
-                                <tr>
-                                    <th class="p-3">Nhân sự</th>
-                                    <th class="p-3">Bộ phận</th>
-                                    <th class="p-3 text-right">Chỉ tiêu</th>
-                                    <th class="p-3 text-right">Thực đạt</th>
-                                    <th class="p-3 text-right">Tỷ lệ đạt</th>
-                                    <th class="p-3 text-right">Hệ số chi trả</th>
-                                    <th class="p-3 text-right">Khoản thưởng</th>
-                                    <th class="p-3 text-center">Trạng thái xử lý</th>
-                                </tr>
-                            </thead>
-                            <tbody id="overview-anchor-tbody" class="divide-y text-slate-700"></tbody>
-                            <tfoot class="bg-slate-50 font-bold border-t border-slate-200 text-slate-900">
-                                <tr>
-                                    <td colspan="6" class="p-3 text-right">Tổng chi thưởng 4 nhân sự:</td>
-                                    <td class="p-3 text-right text-indigo-700 masked-amount" id="anchor-total-payout">83.800.000 ₫</td>
-                                    <td class="p-3 text-center text-xs text-emerald-600">Khớp 104,8% quỹ</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
             </div>
 
             <!-- ============================================================= -->
@@ -320,7 +285,7 @@
                             <span class="text-xs text-slate-400" id="rec-team-count">30 nhân sự</span>
                         </div>
 
-                        <!-- Chọn nhanh 3 nhân vật neo -->
+                        <!-- Chọn nhanh 3 nhân sự đại diện -->
                         <div class="grid grid-cols-3 gap-2">
                             <button onclick="selectRecEmployee('EMP-002')" class="p-2 border border-indigo-600 bg-indigo-50 text-indigo-900 font-bold rounded-lg text-xs hover:bg-indigo-100">Bình</button>
                             <button onclick="selectRecEmployee('EMP-001')" class="p-2 border border-slate-200 bg-slate-50 text-slate-700 font-medium rounded-lg text-xs hover:bg-slate-100">An</button>
@@ -331,86 +296,85 @@
                         <div class="space-y-1 max-h-[420px] overflow-y-auto pr-1" id="rec-employee-list"></div>
                     </div>
 
-                    <!-- Cột phải: Chi tiết 3 nguồn & Đề xuất -->
-                    <div class="lg:col-span-2 space-y-6">
+                    <!-- Cột phải: 1 CARD LÀM VIỆC DUY NHẤT (Gọn gàng, không rối) -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
                         
-                        <!-- Header nhân sự được chọn -->
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div id="rec-detail-avatar" class="w-12 h-12 rounded-full bg-indigo-600 text-white font-bold text-base flex items-center justify-center">
+                        <!-- 1. Header nhân sự & Quyết định Quản lý -->
+                        <div class="flex items-center justify-between border-b pb-4 flex-wrap gap-4">
+                            <div class="flex items-center gap-3">
+                                <div id="rec-detail-avatar" class="w-11 h-11 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center">
                                     BI
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h2 class="text-lg font-bold text-slate-900" id="rec-detail-name">Trần Thị Bình</h2>
-                                        <span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700" id="rec-detail-code">MN-008</span>
+                                        <h2 class="text-base font-bold text-slate-900" id="rec-detail-name">Trần Thị Bình</h2>
+                                        <span class="px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600" id="rec-detail-code">MN-008</span>
                                     </div>
-                                    <p class="text-xs text-slate-500 mt-0.5" id="rec-detail-role">Quản lý Tài khoản Khách hàng &bull; Kinh doanh Miền Nam</p>
+                                    <p class="text-xs text-slate-500" id="rec-detail-role">Quản lý Khách hàng &bull; Kinh doanh Miền Nam</p>
                                 </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openAdjustModal()" class="px-3.5 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 font-semibold text-xs text-slate-700">Điều chỉnh mức khác</button>
+                                <button onclick="agreeProposedRate()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-xs shadow-sm">Đồng ý mức đề xuất</button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Con số đề xuất to rõ -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-slate-500 font-medium">Mức thưởng đề xuất thông minh:</div>
+                                <div class="text-2xl font-bold text-indigo-700 mt-0.5" id="rec-detail-proposed-rate">82,8%</div>
                             </div>
                             <div class="text-right">
-                                <div class="text-xs text-slate-500">Mức đề xuất thông minh:</div>
-                                <div class="text-2xl font-bold text-indigo-600" id="rec-detail-proposed-rate">82,8%</div>
-                                <div class="text-xs font-semibold text-slate-700 masked-amount" id="rec-detail-proposed-amount">16.560.000 ₫</div>
+                                <div class="text-xs text-slate-500 font-medium">Số tiền tương ứng:</div>
+                                <div class="text-xl font-bold text-slate-900 mt-0.5 masked-amount" id="rec-detail-proposed-amount">16.560.000 ₫</div>
                             </div>
                         </div>
 
-                        <!-- 3 Thẻ Nguồn cấu thành (Rất sạch sẽ) -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
-                                <div class="text-xs font-bold text-slate-500 uppercase">1. Theo Quy Tắc (70%)</div>
-                                <div class="text-xl font-bold text-slate-900" id="rec-card-rule-rate">81,5%</div>
-                                <p class="text-xs text-slate-600" id="rec-card-rule-desc">Từ tỷ lệ đạt có trọng số 94,4% sau duyệt độ khó 0.9.</p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
-                                <div class="text-xs font-bold text-slate-500 uppercase">2. Học Máy (30%)</div>
-                                <div class="text-xl font-bold text-indigo-600" id="rec-card-ml-rate">83,0%</div>
-                                <p class="text-xs text-slate-600" id="rec-card-ml-desc">Dự báo theo mẫu hình 4 kỳ lịch sử. Khoảng [75%, 90%].</p>
-                            </div>
-
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
-                                <div class="text-xs font-bold text-slate-500 uppercase">3. Đánh Giá Quản Lý</div>
-                                <div class="text-xl font-bold text-emerald-600" id="rec-card-mgr-delta">+0,8%</div>
-                                <p class="text-xs text-slate-600" id="rec-card-mgr-desc">Điểm chấm 4.3/5 sau chuẩn hóa z-score thói quen chấm.</p>
-                            </div>
-                        </div>
-
-                        <!-- Căn cứ giải thích ngắn gọn -->
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
-                            <h4 class="font-bold text-xs uppercase text-slate-600">Căn cứ tính toán đề xuất</h4>
-                            <div id="rec-explanation-container" class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"></div>
-                        </div>
-
-                        <!-- Thanh kéo mô phỏng mức thưởng What-if -->
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h4 class="font-bold text-xs uppercase text-slate-600">Mô phỏng mức thưởng (What-If)</h4>
-                                    <p class="text-xs text-slate-500">Kéo thử nghiệm để thấy ngay chi phí thay đổi</p>
+                        <!-- 3. Ba nguồn đóng góp (Quy tắc, Học máy, Quản lý) -->
+                        <div>
+                            <div class="text-xs font-bold text-slate-600 uppercase mb-2">3 Nguồn cấu thành mức đề xuất</div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="p-3 rounded-lg border border-slate-200 bg-white">
+                                    <div class="text-xs text-slate-500 font-medium">Theo Quy Tắc (70%)</div>
+                                    <div class="text-lg font-bold text-slate-800 mt-1" id="rec-card-rule-rate">81,5%</div>
+                                    <div class="text-xs text-slate-500 mt-0.5" id="rec-card-rule-desc">Từ tỷ lệ đạt 94,4%.</div>
                                 </div>
-                                <span class="text-base font-bold text-indigo-600" id="whatif-slider-val-display">82,8%</span>
+
+                                <div class="p-3 rounded-lg border border-slate-200 bg-white">
+                                    <div class="text-xs text-slate-500 font-medium">Học Máy (30%)</div>
+                                    <div class="text-lg font-bold text-indigo-600 mt-1" id="rec-card-ml-rate">83,0%</div>
+                                    <div class="text-xs text-slate-500 mt-0.5" id="rec-card-ml-desc">Khoảng [75%, 90%].</div>
+                                </div>
+
+                                <div class="p-3 rounded-lg border border-slate-200 bg-white">
+                                    <div class="text-xs text-slate-500 font-medium">Đánh Giá Quản Lý</div>
+                                    <div class="text-lg font-bold text-emerald-600 mt-1" id="rec-card-mgr-delta">+0,8%</div>
+                                    <div class="text-xs text-slate-500 mt-0.5" id="rec-card-mgr-desc">Điểm chấm 4.3/5.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Căn cứ diễn giải tiếng Việt -->
+                        <div>
+                            <div class="text-xs font-bold text-slate-600 uppercase mb-1.5">Căn cứ tính toán</div>
+                            <div id="rec-explanation-container" class="text-xs text-slate-700 leading-relaxed p-3.5 rounded-lg bg-slate-50 border border-slate-200"></div>
+                        </div>
+
+                        <!-- 5. Thanh kéo mô phỏng mức thưởng What-if -->
+                        <div class="pt-2 border-t border-slate-100 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-700">Mô phỏng mức thưởng (What-If):</span>
+                                <span class="text-xs font-bold text-indigo-600" id="whatif-slider-val-display">82,8%</span>
                             </div>
 
-                            <input type="range" id="whatif-slider" min="0" max="150" value="83" step="1" oninput="handleWhatIfSlider(this.value)" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                            <input type="range" id="whatif-slider" min="0" max="150" value="83" step="1" oninput="handleWhatIfSlider(this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
 
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border text-xs">
+                            <div class="flex items-center justify-between text-xs text-slate-500">
                                 <div>Khoản thưởng mô phỏng: <strong class="text-slate-900 masked-amount" id="whatif-payout-display">16.560.000 ₫</strong> &bull; Chênh lệch: <strong id="whatif-diff-display">0%</strong></div>
-                                <div id="whatif-l2-badge" class="hidden text-amber-700 bg-amber-50 px-2 py-1 rounded font-semibold border border-amber-200">
+                                <div id="whatif-l2-badge" class="hidden text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold border border-amber-200">
                                     Lệch >10%: Cần duyệt cấp hai
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Thao tác Quản lý -->
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-xs text-slate-800">Quyết định của Quản lý:</div>
-                                <div class="text-xs text-slate-500">Chốt mức thưởng hoặc điều chỉnh kèm lý do</div>
-                            </div>
-                            <div class="flex gap-3">
-                                <button onclick="openAdjustModal()" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 font-semibold text-xs text-slate-700">Điều chỉnh mức khác</button>
-                                <button onclick="agreeProposedRate()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-xs shadow-sm">Đồng ý mức đề xuất</button>
                             </div>
                         </div>
 
@@ -449,14 +413,14 @@
                         </div>
                     </div>
 
-                    <!-- Bóc tách công thức -->
+                    <!-- Bóc tách công thức sạch sẽ, không lỗi font LaTeX -->
                     <div class="space-y-2">
-                        <h4 class="font-bold text-xs uppercase text-slate-600">Cách tính toán minh bạch</h4>
+                        <h4 class="font-bold text-xs uppercase text-slate-600">Cách tính toán chi tiết</h4>
                         <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
-                            <p>&bull; <strong>Chỉ tiêu ban đầu</strong>: 1.000.000.000 ₫ cho 4 gói việc kinh doanh.</p>
-                            <p>&bull; <strong>Hiệu chỉnh thị trường</strong>: Áp dụng hệ số độ khó 0.9 do sức mua Đông Nam Bộ suy giảm 10.2%. Chỉ tiêu sau hiệu chỉnh: <strong>900.000.000 ₫</strong>.</p>
-                            <p>&bull; <strong>Doanh số thực tế</strong>: <strong>850.000.000 ₫</strong> (Đạt <strong>94,44%</strong>).</p>
-                            <p>&bull; <strong>Chi trả theo quy chế</strong>: Hệ số = (94,44% - 70%) / 30% = <strong>81,5%</strong> $\rightarrow$ Tiền thưởng: <strong>16.300.000 ₫</strong>.</p>
+                            <p>&bull; <strong>Chỉ tiêu ban đầu:</strong> 1.000.000.000 ₫ cho 4 gói việc kinh doanh.</p>
+                            <p>&bull; <strong>Hiệu chỉnh thị trường:</strong> Áp dụng hệ số độ khó 0.9 do sức mua thị trường Đông Nam Bộ co hẹp 10.2%. Chỉ tiêu sau hiệu chỉnh: <strong>900.000.000 ₫</strong>.</p>
+                            <p>&bull; <strong>Doanh số nghiệm thu:</strong> <strong>850.000.000 ₫</strong> (Tỷ lệ hoàn thành đạt <strong>94,44%</strong>).</p>
+                            <p>&bull; <strong>Chi trả theo quy chế:</strong> Tỷ lệ chi trả tương ứng là <strong>81,5%</strong> &rarr; Tiền thưởng: <strong>16.300.000 ₫</strong>.</p>
                         </div>
                     </div>
 

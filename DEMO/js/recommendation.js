@@ -177,11 +177,11 @@
     const mgrAbsPoints = Math.abs(deltaManager * 100).toFixed(1);
     const highestCriterion = getHighestCriterionText(normEval.details);
 
-    return `Hệ thống đề xuất mức thưởng **${rProposedPercent}** dựa trên sự kết hợp có kiểm soát của 3 nguồn:\n\n` +
-      `1. **Theo quy tắc định lượng**: Tỷ lệ đạt có trọng số của các gói việc đạt **${wRatePercent}**, tương ứng hệ số chi trả **${rRulePercent}** theo đường cong quy chế chuẩn.\n` +
-      `2. **Theo học máy lịch sử**: Phân tích hồ sơ 4 kỳ liên tiếp cho thấy tính ổn định cao; học máy dự báo mức chi trả tham chiếu ${Engine.formatPercent(rML, 1)} (${mlSign} ${mlAbsPoints} điểm phần trăm).\n` +
-      `3. **Theo đánh giá quản lý**: Quản lý trực tiếp chấm điểm bình quân ${normEval.rawScore}/5,0 (trong đó tiêu chí *${highestCriterion}* nổi bật), quy đổi ${mgrSign} ${mgrAbsPoints} điểm phần trăm sau chuẩn hóa thiên kiến cá nhân.\n\n` +
-      `*Mức đề xuất nằm hoàn toàn trong dải linh động an toàn cho phép và không bị chi phối đơn phương bởi bất kỳ nguồn nào.*`;
+    return `Hệ thống đề xuất mức thưởng <strong>${rProposedPercent}</strong> kết hợp từ 3 nguồn:<br><br>` +
+      `1. <strong>Theo quy tắc:</strong> Tỷ lệ đạt có trọng số của các gói việc đạt <strong>${wRatePercent}</strong>, tương ứng hệ số chi trả <strong>${rRulePercent}</strong> theo quy chế.<br>` +
+      `2. <strong>Theo học máy:</strong> Phân tích 4 kỳ trước cho thấy phong độ ổn định; học máy dự báo mức tham chiếu ${Engine.formatPercent(rML, 1)} (${mlSign} ${mlAbsPoints} điểm phần trăm).<br>` +
+      `3. <strong>Theo quản lý:</strong> Đánh giá bình quân ${normEval.rawScore}/5,0 (trong đó tiêu chí ${highestCriterion} nổi bật), quy đổi ${mgrSign} ${mgrAbsPoints} điểm phần trăm sau chuẩn hóa.<br><br>` +
+      `Mức đề xuất nằm an toàn trong dải linh động cho phép.`;
   }
 
   function getHighestCriterionText(details = {}) {
@@ -222,45 +222,44 @@
       
       let peerContext = 'ở mức trung bình';
       if (targetRate < recData.peerStats.medianRate * 0.9) {
-        peerContext = 'thấp hơn đáng kể so với mức trung vị của nhóm đồng cấp';
+        peerContext = 'thấp hơn so với mức trung vị của nhóm đồng cấp';
       } else if (targetRate > recData.peerStats.medianRate * 1.1) {
         peerContext = 'thuộc nhóm dẫn đầu so với các đồng nghiệp cùng vị trí';
       }
 
       const l2Warning = Math.abs(targetRate - recData.rProposed) > 0.10
-        ? `\n\n⚠️ **Lưu ý nghiệp vụ**: Mức điều chỉnh này lệch quá 10 điểm phần trăm so với đề xuất (${(Math.abs(targetRate - recData.rProposed) * 100).toFixed(1)} điểm), do đó bắt buộc phải nhập lý do giải trình chi tiết và sẽ chuyển sang cấp Hội đồng / Admin phê duyệt cấp hai.`
+        ? `<br><br><span class="text-amber-700 font-semibold">Lưu ý: Mức điều chỉnh này lệch quá 10 điểm phần trăm so với đề xuất (${(Math.abs(targetRate - recData.rProposed) * 100).toFixed(1)} điểm), bắt buộc phải nhập lý do chi tiết và cần Hội đồng Admin phê duyệt cấp hai.</span>`
         : '';
 
-      return `Nếu điều chỉnh mức thưởng về **${Engine.formatPercent(targetRate, 1)}**:\n\n` +
-        `- Khoản thưởng chi trả sẽ là **${Engine.formatVND(targetAmount)}** (${signText} ${absDiffStr} so với đề xuất ban đầu).\n` +
-        `- Mức này ${peerContext} (Trung vị nhóm: ${Engine.formatPercent(recData.peerStats.medianRate, 1)}, dao động từ ${Engine.formatPercent(recData.peerStats.minRate, 1)} đến ${Engine.formatPercent(recData.peerStats.maxRate, 1)}).${l2Warning}`;
+      return `Nếu điều chỉnh mức thưởng về <strong>${Engine.formatPercent(targetRate, 1)}</strong>:<br><br>` +
+        `• Khoản thưởng chi trả sẽ là <strong>${Engine.formatVND(targetAmount)}</strong> (${signText} ${absDiffStr} so với đề xuất).<br>` +
+        `• Mức này ${peerContext} (Trung vị nhóm: ${Engine.formatPercent(recData.peerStats.medianRate, 1)}, từ ${Engine.formatPercent(recData.peerStats.minRate, 1)} đến ${Engine.formatPercent(recData.peerStats.maxRate, 1)}).${l2Warning}`;
     }
 
     if (questionKey === 'peer_comparison') {
       const p = recData.peerStats;
       const myRate = recData.rProposed;
       const rankStatus = myRate >= p.medianRate ? 'cao hơn' : 'thấp hơn';
-      return `So với **${p.count} đồng nghiệp** cùng chức danh (${emp.role}):\n\n` +
-        `- Mức đề xuất của ${emp.name} là **${Engine.formatPercent(myRate, 1)}**, ${rankStatus} trung vị nhóm (${Engine.formatPercent(p.medianRate, 1)}).\n` +
-        `- Dải thưởng của nhóm đồng cấp hiện dao động từ ${Engine.formatPercent(p.minRate, 1)} đến ${Engine.formatPercent(p.maxRate, 1)}.\n` +
-        `- Quy mô công việc đảm nhận đạt hệ số ${recData.scaleFactor} lần so với khối lượng trung bình của nhóm.`;
+      return `So với <strong>${p.count} đồng nghiệp</strong> cùng chức danh (${emp.role}):<br><br>` +
+        `• Mức đề xuất của ${emp.name} là <strong>${Engine.formatPercent(myRate, 1)}</strong>, ${rankStatus} trung vị nhóm (${Engine.formatPercent(p.medianRate, 1)}).<br>` +
+        `• Dải thưởng của nhóm đồng cấp dao động từ ${Engine.formatPercent(p.minRate, 1)} đến ${Engine.formatPercent(p.maxRate, 1)}.<br>` +
+        `• Quy mô công việc đảm nhận đạt hệ số ${recData.scaleFactor} lần so với khối lượng trung bình của nhóm.`;
     }
 
     if (questionKey === 'promotion_check') {
       if (emp.promotionReady) {
-        return `✅ **Cân nhắc thăng tiến: CÓ THỂ ĐỀ XUẤT**\n\n` +
-          `**Căn cứ đánh giá**:\n` +
-          `- ${emp.promotionRationale || 'Hiệu suất hoàn thành chỉ tiêu cao và bền vững qua nhiều kỳ liên tiếp.'}\n` +
-          `- Điểm đánh giá năng lực của Quản lý trực tiếp đạt ${recData.managerRawScore}/5,0.\n` +
-          `- Thâm niên công tác ${emp.seniority} năm tại vị trí hiện tại đã đáp ứng tiêu chuẩn quy hoạch cán bộ nguồn.`;
+        return `<strong>Cân nhắc thăng tiến: Có thể đề xuất</strong><br><br>` +
+          `• Căn cứ: ${emp.promotionRationale || 'Hiệu suất hoàn thành chỉ tiêu cao và bền vững qua nhiều kỳ.'}<br>` +
+          `• Đánh giá năng lực của Quản lý trực tiếp đạt ${recData.managerRawScore}/5,0.<br>` +
+          `• Thâm niên công tác ${emp.seniority} năm đã đáp ứng tiêu chuẩn quy hoạch.`;
       } else {
-        return `ℹ️ **Cân nhắc thăng tiến: CHƯA ĐỦ ĐIỀU KIỆN**\n\n` +
-          `- Nhân sự hiện đang duy trì tiến độ công việc ở mức ổn định nhưng chưa đạt chuỗi 3 kỳ liên tiếp vượt trội (>105%).\n` +
-          `- Thâm niên hiện tại (${emp.seniority} năm) cần thêm thời gian tích lũy tại vị trí ${emp.role}.`;
+        return `<strong>Cân nhắc thăng tiến: Chưa đủ điều kiện</strong><br><br>` +
+          `• Nhân sự hiện đang duy trì tiến độ ở mức ổn định nhưng chưa đạt chuỗi 3 kỳ liên tiếp vượt trội (>105%).<br>` +
+          `• Thâm niên hiện tại (${emp.seniority} năm) cần thêm thời gian tích lũy tại vị trí ${emp.role}.`;
       }
     }
 
-    return 'Hệ thống đã ghi nhận câu hỏi của bạn và tổng hợp câu trả lời dựa trên dữ liệu thật.';
+    return 'Hệ thống đã ghi nhận câu hỏi của bạn và trích xuất câu trả lời từ dữ liệu.';
   }
 
   const SmartRecommendationEngine = {

@@ -292,11 +292,21 @@
     let nearThresholdLower = 0; // 65% - 69.9%
 
     employees.forEach(emp => {
-      const rate = Number(emp.achievementRate || 0);
+      const rawTarget = Number(emp.target) || 0;
+      const rawActual = Number(emp.actual) || 0;
+      const target = rawTarget * (Number(emp.difficultyFactor) || 1.0);
+      const rate = Number(emp.achievementRate) || (target > 0 ? (rawActual / target) : 0);
+      
       totalRawRate += rate;
-      totalWeightedRate += Number(emp.weightedRate || rate);
-      totalIncentive += Number(emp.finalIncentive || emp.incentiveAmount || 0);
-      totalActualRev += Number(emp.actual || 0);
+      totalWeightedRate += Number(emp.weightedRate) || rate;
+
+      let inc = Number(emp.finalIncentive || emp.incentiveAmount || 0);
+      if (inc <= 0 && target > 0) {
+        const factor = calculatePayoutFactor(rate);
+        inc = Math.round((Number(emp.baseIncentive) || 20000000) * factor);
+      }
+      totalIncentive += inc;
+      totalActualRev += rawActual;
 
       if (rate >= 0.95 && rate < 1.00) nearThresholdUpper++;
       if (rate >= 0.65 && rate < 0.70) nearThresholdLower++;
