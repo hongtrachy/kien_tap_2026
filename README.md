@@ -1,93 +1,73 @@
-# Nền tảng Quản lý & Phân tích Incentive (Incentive Lifecycle Platform)
+# Hệ thống Quản lý và Đề xuất Thưởng Thông minh (Incentive Management & Analytics)
 
-Web Demo nền tảng quản trị và phân tích toàn bộ vòng đời thưởng (Incentive Management & Analytics) phục vụ chuyên viên C&B, Kế toán trưởng, Line Manager và Nhân viên.
+Nền tảng quản trị và phân tích toàn bộ vòng đời thưởng (Incentive Lifecycle Platform) tích hợp **Học máy (Machine Learning)** và **Cơ chế đề xuất 3 nguồn** phục vụ chuyên viên C&B, Hội đồng duyệt / Kế toán, Quản lý trực tiếp và Nhân viên.
 
-## 1. Cách chạy ứng dụng
+> [!NOTE]
+> **Nhánh phát triển**: `feature/de-xuat-thuong-thong-minh` (Tạo từ nhánh `ux-overhaul`).  
+> **Lưu ý bảo mật**: Cơ chế xác thực tài khoản trong ứng dụng là cơ chế mô phỏng trên trình duyệt phục vụ đánh giá đề tài kiến tập, không phải giải pháp bảo mật thật cấp doanh nghiệp.
+
+---
+
+## 1. Khởi chạy Ứng dụng
 
 ### Chạy trực tiếp qua HTTP Server (Khuyên dùng)
-Do tính năng đọc file CSV (`csv.csv`) cần giao thức HTTP (tránh bị trình duyệt chặn CORS):
+Để ứng dụng đọc tệp tin dự đoán học máy JSON (`DEMO/data/ml_predictions.json`) không bị trình duyệt chặn CORS:
 ```bash
-# Sử dụng Python (có sẵn trên máy)
+# Khởi chạy bằng Python
 python -m http.server 8080 --directory DEMO
 
-# Mở trình duyệt tại địa chỉ:
+# Truy cập ứng dụng tại trình duyệt:
 http://localhost:8080/index.html
 ```
 
-Hoặc sử dụng Node.js:
-```bash
-npx serve DEMO -l 8080
-```
+---
 
-### Chạy kiểm thử tự động (Unit Tests)
-Kiểm tra tính chính xác của hàm tính toán lõi cho 4 nhân vật neo (An, Bình, Chi, Dũng):
+## 2. Tài khoản Mẫu và Phân quyền Mô phỏng
+
+Hệ thống cung cấp 3 tài khoản đại diện với quyền hạn và góc nhìn được phân định nghiêm ngặt:
+
+| Vai trò | Tên tài khoản | Tên hiển thị | Thẩm quyền dữ liệu & Giao diện |
+| :--- | :--- | :--- | :--- |
+| **Admin (C&B & Tài chính)** | `admin` | Nguyễn Thu Trang | Xem toàn công ty, điều hành tối ưu cơ chế, phê duyệt cấp hai, xuất file chi trả Payroll CSV. |
+| **Quản lý trực tiếp** | `manager` | Trần Minh Đức | Xem nhân viên thuộc phòng mình (Kinh doanh Miền Nam), đánh giá hiệu suất, đề xuất thưởng, quyết định thưởng cuối. |
+| **Nhân viên** | `employee` | Trần Thị Bình (EMP-002) | Chỉ xem duy nhất dữ liệu của bản thân (Phiếu thưởng minh bạch), gửi yêu cầu giải trình / khiếu nại. Bị chặn tuyệt đối các màn hình quản trị. |
+
+*Thanh trên cùng có hộp chọn "Vai trò" để người thuyết trình chuyển nhanh giữa 3 góc nhìn trong buổi báo cáo 5 phút.*
+
+---
+
+## 3. Kiểm thử Tự động (Unit Tests)
+
+Hệ thống trang bị 3 bộ kiểm thử tự động độc lập:
+
 ```bash
+# 1. Kiểm thử tính toán lõi cho 4 nhân vật neo (An, Bình, Chi, Dũng)
 node tests/test_engine.mjs
+
+# 2. Kiểm thử tỷ lệ có trọng số, hệ số quy mô, đề xuất 3 nguồn và ngân sách quỹ
+node tests/test_engine_v2.mjs
+
+# 3. Kiểm thử phân quyền truy cập và bảo vệ dữ liệu giữa 3 vai trò
+node tests/test_auth.mjs
 ```
 
-Kiểm tra toàn bộ luồng demo 5 phút bằng headless Chrome:
+### Pipeline Huấn luyện Học máy (Machine Learning)
 ```bash
-node scripts/test_demo_flow.mjs
+# Chạy script Python huấn luyện và kiểm tra công bằng
+python ml/train.py
+
+# Hoặc sinh lại tệp JSON dự đoán bằng Node.js
+node ml/generate_ml_data.mjs
 ```
 
 ---
 
-## 2. Cấu trúc thư mục
+## 4. Cấu trúc Tài liệu Bàn giao
 
-```
-KIENTAP_ - Copy/
-├── AUDIT.md                   # Báo cáo audit hiện trạng ban đầu (Trước khi sửa)
-├── CHANGELOG.md               # Báo cáo chi tiết sau tối ưu & Tự phản biện thiết kế
-├── README.md                  # Hướng dẫn chạy và cấu hình
-├── DEMO/                      # Thư mục mã nguồn ứng dụng web
-│   ├── index.html             # Giao diện chính (8 màn hình & Drawer chi tiết)
-│   ├── csv.csv                # Bộ dữ liệu may mặc Kaggle đối chiếu
-│   ├── css/
-│   │   ├── tokens.css         # Design tokens: Thang màu Slate, Deep Teal, Typography
-│   │   └── styles.css         # Stylesheet trung tâm (Chống AI-slop, tabular-nums)
-│   └── js/
-│       ├── engine.js          # Hàm tính toán lõi duy nhất (Pure calculation engine)
-│       ├── dataset.js         # Bộ 120 nhân sự chuẩn hóa Q3/2026 & 4 nhân vật neo
-│       ├── app.js             # Quản lý trạng thái, routing, drawer và kịch bản demo
-│       ├── charts.js          # Khởi tạo biểu đồ phân tích (Chart.js)
-│       └── automation.js      # Module xử lý dữ liệu tự động
-├── tests/
-│   └── test_engine.mjs        # Unit test suite kiểm thử chính xác từng con số
-├── scripts/
-│   ├── capture_before.mjs     # Script chụp ảnh giao diện ban đầu
-│   ├── capture_after.mjs      # Script chụp ảnh 8 màn hình sau tối ưu
-│   └── test_demo_flow.mjs     # Script kiểm tra kịch bản thuyết trình 5 phút
-└── docs/
-    └── screenshots/
-        ├── before/            # 4 ảnh chụp hiện trạng ban đầu
-        └── after/             # 8 ảnh chụp giao diện hoàn thiện sau tối ưu
-```
-
----
-
-## 3. Cách thay đổi cấu hình Scheme
-
-Các tham số của đường cong chi trả được tham số hóa động tại `DEMO/js/engine.js`:
-```javascript
-const DEFAULT_SCHEME_CONFIG = {
-  thresholdMin: 0.70,     // Dưới 70% không có thưởng (0.0x)
-  thresholdTarget: 1.00,  // Đạt 100% nhận 1.0 lần mức thưởng mục tiêu
-  thresholdMax: 1.20,     // Từ 100% đến 120% tăng tuyến tính lên 1.5x
-  factorAtMin: 0.0,
-  factorAtTarget: 1.0,
-  factorCap: 1.5,         // Trần hệ số chi trả tối đa bảo vệ ngân sách
-  defaultTargetIncentive: 20000000 // 20 triệu VNĐ
-};
-```
-Bạn cũng có thể thay đổi trực tiếp trên giao diện tại mục **Thiết kế & Mô phỏng (What-If)** để kéo thanh trượt mô phỏng ngân sách trước khi áp dụng.
-
----
-
-## 4. Kịch bản Demo 5 phút phục vụ thuyết trình
-
-1. **Tổng quan (Phút 1)**: Mở Tổng quan thấy kỳ Q3/2026 đang ở bước **Validate & Approve**, ngân sách dự kiến và 3 việc khẩn cấp cần làm hôm nay.
-2. **Kiểm tra dữ liệu (Phút 2)**: Vào Kiểm tra dữ liệu &rarr; xem so sánh Before vs After của **Dũng** &rarr; bấm "Khấu trừ bản ghi trùng 90M" &rarr; thưởng Dũng về 20M chuẩn.
-3. **Hiệu chỉnh Target (Phút 3)**: Chuyển vai trò sang **Approver (Hội đồng hiệu chỉnh)** &rarr; xem đề xuất của **Bình** (thị trường co hẹp 10.2%) &rarr; bấm "Phê duyệt hệ số 0.9" &rarr; target thành 900M, thưởng thành 16.3M và ghi nhật ký người duyệt.
-4. **Phê duyệt Lô & Xuất Payroll (Phút 4)**: Bấm "Duyệt toàn bộ lô" &rarr; bấm "Xuất CSV cho Payroll" kèm modal xác nhận an toàn.
-5. **Phân tích Scheme (Phút 4.5)**: Xem đường cong chi trả liên tục với 4 nhân vật neo & biểu đồ phát hiện dồn ứ tại 95% - 99% kèm khối "Đề xuất để cân nhắc".
-6. **Bản giải trình Nhân viên (Phút 5)**: Đổi vai trò sang **Nhân viên (Bình)** &rarr; hiển thị thẻ di động giải thích minh bạch từng bước tính và nút gửi khiếu nại.
+- [`DU_LIEU_VA_CONG_THUC.md`](DU_LIEU_VA_CONG_THUC.md): Bản mô tả chi tiết toàn bộ các trường dữ liệu, công thức tính toán và chỉ số kinh doanh.
+- [`ML_KHAO_SAT.md`](ML_KHAO_SAT.md): Báo cáo khảo sát dữ liệu nhân sự công khai, kiến trúc mô hình Gradient Boosting, và thẻ mô hình.
+- [`ASSUMPTIONS.md`](ASSUMPTIONS.md): Bảng tổng hợp các giả định khoa học, thiết kế đầu việc và phương pháp luận mô phỏng.
+- [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md): Kịch bản thuyết trình demo 5 phút chi tiết theo từng phút với số liệu thực tế.
+- [`LY_DO_DE_XUAT_HE_THONG.md`](LY_DO_DE_XUAT_HE_THONG.md): Bài luận văn xuôi phục vụ viết báo cáo khoa học.
+- [`CHANGELOG.md`](CHANGELOG.md): Báo cáo chi tiết quá trình tối ưu và tự phản biện thiết kế.
+- [`AUDIT.md`](AUDIT.md): Báo cáo hiện trạng ban đầu trước khi nâng cấp.

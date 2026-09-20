@@ -1,0 +1,3816 @@
+{
+  "metadata": {
+    "modelName": "Incentive-Predictor-GBR-v2",
+    "version": "2.0.0",
+    "algorithm": "Gradient Boosting Regressor with Quantile Prediction Intervals",
+    "framework": "Scikit-learn / Node Simulation Dual Stack",
+    "trainedRecords": 480,
+    "featuresUsed": [
+      "Tỷ lệ đạt có trọng số kỳ hiện tại (current_weighted_rate)",
+      "Tỷ lệ đạt trung bình 4 kỳ trước (hist_avg_rate)",
+      "Độ dốc xu hướng hoàn thành theo thời gian (hist_rate_trend)",
+      "Độ lệch chuẩn biến động hiệu suất (hist_volatility)",
+      "Thâm niên công tác (seniority)",
+      "Cấp bậc chuyên môn (job_level)",
+      "Tổng quy mô các gói việc đảm nhận (total_work_volume)"
+    ],
+    "featuresExcludedForFairness": [
+      "Giới tính (Gender)",
+      "Độ tuổi (Age)",
+      "Tình trạng hôn nhân (Marital Status)",
+      "Dân tộc & Quê quán",
+      "Quan hệ cá nhân với lãnh đạo"
+    ],
+    "metrics": {
+      "mae": 0.031,
+      "rmse": 0.045,
+      "r2Score": 0.892,
+      "p10Coverage": 0.82
+    },
+    "fairnessAudit": {
+      "departmentParity": "Độ lệch chuẩn giữa các phòng ban: 0.024 (Rất đồng đều)",
+      "disparateImpactRatio": 0.96,
+      "status": "PASSED"
+    },
+    "intendedUse": "Hỗ trợ Quản lý trực tiếp và Hội đồng C&B tham khảo mức thưởng khách quan dựa trên năng lực và lịch sử, không dùng để tự động quyết định chi trả.",
+    "limitations": "Nhãn dữ liệu lịch sử là mô phỏng toán học có kiểm soát do tính chất bảo mật lương thưởng doanh nghiệp. Không áp dụng cho nhân sự thử việc dưới 3 tháng.",
+    "exportTimestamp": "2026-09-20T11:15:26.228Z"
+  },
+  "predictions": {
+    "EMP-001": {
+      "employeeId": "EMP-001",
+      "name": "Nguyễn Văn An",
+      "rML": 1.223,
+      "intervalP10": 1.181,
+      "intervalP90": 1.265,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.098,
+        "histTrend": 0.03,
+        "histVolatility": 0.035,
+        "currentWeightedRate": 1.15,
+        "seniority": 4.5,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.09",
+          "text": "Thực đạt kỳ này đạt 115.0% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 109.7%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.5 năm tại vị trí Chuyên viên Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-002": {
+      "employeeId": "EMP-002",
+      "name": "Trần Thị Bình",
+      "rML": 0.909,
+      "intervalP10": 0.863,
+      "intervalP90": 0.955,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 0.96,
+        "histTrend": -0.023,
+        "histVolatility": 0.038,
+        "currentWeightedRate": 0.85,
+        "seniority": 3.2,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.09",
+          "text": "Thực đạt kỳ này đạt 85.0% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.2 năm tại vị trí Quản lý Tài khoản Khách hàng thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-003": {
+      "employeeId": "EMP-003",
+      "name": "Lê Hoàng Chi",
+      "rML": 1.042,
+      "intervalP10": 1.002,
+      "intervalP90": 1.082,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.003,
+        "histTrend": 0,
+        "histVolatility": 0.011,
+        "currentWeightedRate": 1,
+        "seniority": 2.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 100.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-004": {
+      "employeeId": "EMP-004",
+      "name": "Phạm Tiến Dũng",
+      "rML": 0.995,
+      "intervalP10": 0.955,
+      "intervalP90": 1.035,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.003,
+        "histTrend": -0.003,
+        "histVolatility": 0.015,
+        "currentWeightedRate": 0.909,
+        "seniority": 5,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 90.9% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5 năm tại vị trí Trưởng nhóm Vận hành thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-005": {
+      "employeeId": "EMP-005",
+      "name": "Võ Minh Phong",
+      "rML": 1.013,
+      "intervalP10": 0.921,
+      "intervalP90": 1.105,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 0.969,
+        "histTrend": 0.054,
+        "histVolatility": 0.077,
+        "currentWeightedRate": 0.972,
+        "seniority": 2.9,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 97.2% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-006": {
+      "employeeId": "EMP-006",
+      "name": "Hoàng Gia Long",
+      "rML": 1.042,
+      "intervalP10": 0.965,
+      "intervalP90": 1.119,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.988,
+        "histTrend": 0.015,
+        "histVolatility": 0.064,
+        "currentWeightedRate": 0.991,
+        "seniority": 4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 99.1% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-007": {
+      "employeeId": "EMP-007",
+      "name": "Hồ Ngọc Hưng",
+      "rML": 0.997,
+      "intervalP10": 0.912,
+      "intervalP90": 1.082,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.946,
+        "histTrend": 0.013,
+        "histVolatility": 0.07,
+        "currentWeightedRate": 0.966,
+        "seniority": 3.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 96.5% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.4 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-008": {
+      "employeeId": "EMP-008",
+      "name": "Vũ Thị Phong",
+      "rML": 1.04,
+      "intervalP10": 0.981,
+      "intervalP90": 1.099,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.021,
+        "histTrend": -0.021,
+        "histVolatility": 0.049,
+        "currentWeightedRate": 0.976,
+        "seniority": 3.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 97.6% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.8 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-009": {
+      "employeeId": "EMP-009",
+      "name": "Võ Phương Quang",
+      "rML": 1.031,
+      "intervalP10": 0.952,
+      "intervalP90": 1.11,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.965,
+        "histTrend": 0.044,
+        "histVolatility": 0.066,
+        "currentWeightedRate": 0.96,
+        "seniority": 6.1,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 96.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.1 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-010": {
+      "employeeId": "EMP-010",
+      "name": "Võ Ngọc Việt",
+      "rML": 0.999,
+      "intervalP10": 0.959,
+      "intervalP90": 1.039,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.941,
+        "histTrend": -0.014,
+        "histVolatility": 0.019,
+        "currentWeightedRate": 0.974,
+        "seniority": 3.5,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 97.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.5 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-011": {
+      "employeeId": "EMP-011",
+      "name": "Lê Minh Long",
+      "rML": 1.006,
+      "intervalP10": 0.945,
+      "intervalP90": 1.067,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.951,
+        "histTrend": 0.047,
+        "histVolatility": 0.051,
+        "currentWeightedRate": 0.96,
+        "seniority": 4.1,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 96.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.1 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-012": {
+      "employeeId": "EMP-012",
+      "name": "Lê Gia Khánh",
+      "rML": 1.048,
+      "intervalP10": 0.956,
+      "intervalP90": 1.14,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 0.979,
+        "histTrend": 0.054,
+        "histVolatility": 0.077,
+        "currentWeightedRate": 0.984,
+        "seniority": 5,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 98.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-013": {
+      "employeeId": "EMP-013",
+      "name": "Ngô Kim Tâm",
+      "rML": 1.03,
+      "intervalP10": 0.944,
+      "intervalP90": 1.116,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 0.937,
+        "histTrend": 0.004,
+        "histVolatility": 0.072,
+        "currentWeightedRate": 0.981,
+        "seniority": 6.8,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 98.1% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.8 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-014": {
+      "employeeId": "EMP-014",
+      "name": "Huỳnh Phương Phong",
+      "rML": 0.976,
+      "intervalP10": 0.936,
+      "intervalP90": 1.016,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.996,
+        "histTrend": 0.015,
+        "histVolatility": 0.026,
+        "currentWeightedRate": 0.934,
+        "seniority": 1.3,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 93.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-015": {
+      "employeeId": "EMP-015",
+      "name": "Hồ Quốc Tuấn",
+      "rML": 0.957,
+      "intervalP10": 0.902,
+      "intervalP90": 1.012,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 0.961,
+        "histTrend": -0.032,
+        "histVolatility": 0.046,
+        "currentWeightedRate": 0.95,
+        "seniority": 0.6,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 95.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-016": {
+      "employeeId": "EMP-016",
+      "name": "Đặng Văn Đạt",
+      "rML": 1.015,
+      "intervalP10": 0.975,
+      "intervalP90": 1.055,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1,
+        "histTrend": 0.005,
+        "histVolatility": 0.029,
+        "currentWeightedRate": 0.965,
+        "seniority": 2.8,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 96.5% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-017": {
+      "employeeId": "EMP-017",
+      "name": "Huỳnh Thị Thảo",
+      "rML": 1.038,
+      "intervalP10": 0.959,
+      "intervalP90": 1.117,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.968,
+        "histTrend": 0.046,
+        "histVolatility": 0.066,
+        "currentWeightedRate": 0.987,
+        "seniority": 4.5,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 98.7% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.5 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-018": {
+      "employeeId": "EMP-018",
+      "name": "Đặng Ngọc Cường",
+      "rML": 1.018,
+      "intervalP10": 0.962,
+      "intervalP90": 1.074,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.968,
+        "histTrend": 0.038,
+        "histVolatility": 0.046,
+        "currentWeightedRate": 0.989,
+        "seniority": 2.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 98.9% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-019": {
+      "employeeId": "EMP-019",
+      "name": "Võ Minh Việt",
+      "rML": 1.005,
+      "intervalP10": 0.936,
+      "intervalP90": 1.074,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 0.986,
+        "histTrend": -0.004,
+        "histVolatility": 0.058,
+        "currentWeightedRate": 0.966,
+        "seniority": 2.6,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 96.6% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-020": {
+      "employeeId": "EMP-020",
+      "name": "Dương Hồng Trang",
+      "rML": 1.009,
+      "intervalP10": 0.944,
+      "intervalP90": 1.074,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.968,
+        "histTrend": -0.001,
+        "histVolatility": 0.054,
+        "currentWeightedRate": 0.974,
+        "seniority": 3.2,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 97.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.2 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-021": {
+      "employeeId": "EMP-021",
+      "name": "Đinh Kim Thắng",
+      "rML": 0.981,
+      "intervalP10": 0.907,
+      "intervalP90": 1.055,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 0.961,
+        "histTrend": 0.04,
+        "histVolatility": 0.062,
+        "currentWeightedRate": 0.943,
+        "seniority": 2.5,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 94.3% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-022": {
+      "employeeId": "EMP-022",
+      "name": "Đặng Quốc Long",
+      "rML": 1.026,
+      "intervalP10": 0.953,
+      "intervalP90": 1.099,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 0.972,
+        "histTrend": -0.048,
+        "histVolatility": 0.061,
+        "currentWeightedRate": 0.983,
+        "seniority": 4.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 98.3% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.7 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-023": {
+      "employeeId": "EMP-023",
+      "name": "Vũ Gia Trung",
+      "rML": 1.057,
+      "intervalP10": 0.978,
+      "intervalP90": 1.136,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.002,
+        "histTrend": -0.003,
+        "histVolatility": 0.066,
+        "currentWeightedRate": 0.984,
+        "seniority": 5.6,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 98.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5.6 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-024": {
+      "employeeId": "EMP-024",
+      "name": "Trần Đức Thắng",
+      "rML": 1.038,
+      "intervalP10": 0.998,
+      "intervalP90": 1.078,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.981,
+        "histTrend": 0.009,
+        "histVolatility": 0.02,
+        "currentWeightedRate": 0.988,
+        "seniority": 4.3,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 98.8% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.3 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-025": {
+      "employeeId": "EMP-025",
+      "name": "Trần Kim Thảo",
+      "rML": 0.476,
+      "intervalP10": 0.436,
+      "intervalP90": 0.516,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.433,
+        "histTrend": -0.003,
+        "histVolatility": 0.02,
+        "currentWeightedRate": 0.454,
+        "seniority": 2.8,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.33",
+          "text": "Thực đạt kỳ này đạt 45.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 43.3%)."
+        }
+      ]
+    },
+    "EMP-026": {
+      "employeeId": "EMP-026",
+      "name": "Ngô Phương Hưng",
+      "rML": 0.548,
+      "intervalP10": 0.508,
+      "intervalP90": 0.588,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.519,
+        "histTrend": 0.003,
+        "histVolatility": 0.022,
+        "currentWeightedRate": 0.504,
+        "seniority": 4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.30",
+          "text": "Thực đạt kỳ này đạt 50.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 51.9%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-027": {
+      "employeeId": "EMP-027",
+      "name": "Vũ Hải Việt",
+      "rML": 0.625,
+      "intervalP10": 0.585,
+      "intervalP90": 0.665,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.576,
+        "histTrend": -0.023,
+        "histVolatility": 0.028,
+        "currentWeightedRate": 0.578,
+        "seniority": 5.1,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.25",
+          "text": "Thực đạt kỳ này đạt 57.8% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 57.6%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5.1 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-028": {
+      "employeeId": "EMP-028",
+      "name": "Dương Phương Mai",
+      "rML": 0.639,
+      "intervalP10": 0.598,
+      "intervalP90": 0.68,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.593,
+        "histTrend": 0,
+        "histVolatility": 0.035,
+        "currentWeightedRate": 0.591,
+        "seniority": 4.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.25",
+          "text": "Thực đạt kỳ này đạt 59.1% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 59.3%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.8 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-029": {
+      "employeeId": "EMP-029",
+      "name": "Hồ Thị Hà",
+      "rML": 0.643,
+      "intervalP10": 0.595,
+      "intervalP90": 0.691,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 0.603,
+        "histTrend": -0.024,
+        "histVolatility": 0.04,
+        "currentWeightedRate": 0.596,
+        "seniority": 4.9,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.24",
+          "text": "Thực đạt kỳ này đạt 59.6% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 60.3%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.9 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-030": {
+      "employeeId": "EMP-030",
+      "name": "Hoàng Gia Hưng",
+      "rML": 0.709,
+      "intervalP10": 0.669,
+      "intervalP90": 0.749,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.675,
+        "histTrend": 0.011,
+        "histVolatility": 0.014,
+        "currentWeightedRate": 0.669,
+        "seniority": 3.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.20",
+          "text": "Thực đạt kỳ này đạt 66.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 67.5%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.7 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-031": {
+      "employeeId": "EMP-031",
+      "name": "Trần Thanh Anh",
+      "rML": 0.481,
+      "intervalP10": 0.441,
+      "intervalP90": 0.521,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.491,
+        "histTrend": -0.008,
+        "histVolatility": 0.01,
+        "currentWeightedRate": 0.469,
+        "seniority": 0.7,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.32",
+          "text": "Thực đạt kỳ này đạt 46.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 49.1%)."
+        }
+      ]
+    },
+    "EMP-032": {
+      "employeeId": "EMP-032",
+      "name": "Phan Hồng Dũng",
+      "rML": 0.541,
+      "intervalP10": 0.501,
+      "intervalP90": 0.581,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.507,
+        "histTrend": -0.009,
+        "histVolatility": 0.02,
+        "currentWeightedRate": 0.497,
+        "seniority": 4.3,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.30",
+          "text": "Thực đạt kỳ này đạt 49.7% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 50.7%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.3 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-033": {
+      "employeeId": "EMP-033",
+      "name": "Võ Đức Quân",
+      "rML": 0.494,
+      "intervalP10": 0.454,
+      "intervalP90": 0.534,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.45,
+        "histTrend": 0.002,
+        "histVolatility": 0.025,
+        "currentWeightedRate": 0.452,
+        "seniority": 4.3,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.33",
+          "text": "Thực đạt kỳ này đạt 45.2% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 45.0%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.3 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-034": {
+      "employeeId": "EMP-034",
+      "name": "Huỳnh Quốc Thắng",
+      "rML": 0.565,
+      "intervalP10": 0.525,
+      "intervalP90": 0.605,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.535,
+        "histTrend": -0.003,
+        "histVolatility": 0.017,
+        "currentWeightedRate": 0.536,
+        "seniority": 3,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.28",
+          "text": "Thực đạt kỳ này đạt 53.6% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 53.5%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3 năm tại vị trí Chuyên viên Kinh doanh Cấp 2 thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-035": {
+      "employeeId": "EMP-035",
+      "name": "Hồ Hải Trang",
+      "rML": 0.537,
+      "intervalP10": 0.497,
+      "intervalP90": 0.577,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.517,
+        "histTrend": -0.008,
+        "histVolatility": 0.012,
+        "currentWeightedRate": 0.499,
+        "seniority": 3.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.30",
+          "text": "Thực đạt kỳ này đạt 49.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 51.6%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.4 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-036": {
+      "employeeId": "EMP-036",
+      "name": "Võ Ngọc Nam",
+      "rML": 0.662,
+      "intervalP10": 0.618,
+      "intervalP90": 0.706,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.629,
+        "histTrend": 0.016,
+        "histVolatility": 0.036,
+        "currentWeightedRate": 0.624,
+        "seniority": 3.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.23",
+          "text": "Thực đạt kỳ này đạt 62.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 62.9%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.4 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-037": {
+      "employeeId": "EMP-037",
+      "name": "Đặng Thanh Anh",
+      "rML": 0.506,
+      "intervalP10": 0.466,
+      "intervalP90": 0.546,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.441,
+        "histTrend": -0.01,
+        "histVolatility": 0.019,
+        "currentWeightedRate": 0.455,
+        "seniority": 5.6,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.33",
+          "text": "Thực đạt kỳ này đạt 45.5% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 44.1%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5.6 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-038": {
+      "employeeId": "EMP-038",
+      "name": "Đỗ Thanh Nam",
+      "rML": 0.602,
+      "intervalP10": 0.562,
+      "intervalP90": 0.642,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.546,
+        "histTrend": 0.013,
+        "histVolatility": 0.02,
+        "currentWeightedRate": 0.559,
+        "seniority": 4.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.26",
+          "text": "Thực đạt kỳ này đạt 55.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 54.6%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.4 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-039": {
+      "employeeId": "EMP-039",
+      "name": "Đỗ Thanh Trang",
+      "rML": 0.609,
+      "intervalP10": 0.569,
+      "intervalP90": 0.649,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.586,
+        "histTrend": -0.001,
+        "histVolatility": 0.024,
+        "currentWeightedRate": 0.592,
+        "seniority": 1.8,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.24",
+          "text": "Thực đạt kỳ này đạt 59.2% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 58.6%)."
+        }
+      ]
+    },
+    "EMP-040": {
+      "employeeId": "EMP-040",
+      "name": "Nguyễn Tuấn Yến",
+      "rML": 0.925,
+      "intervalP10": 0.872,
+      "intervalP90": 0.978,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 0.886,
+        "histTrend": 0.004,
+        "histVolatility": 0.044,
+        "currentWeightedRate": 0.888,
+        "seniority": 3.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 88.8% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 88.6%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.7 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-041": {
+      "employeeId": "EMP-041",
+      "name": "Dương Gia Thắng",
+      "rML": 0.761,
+      "intervalP10": 0.707,
+      "intervalP90": 0.815,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 0.741,
+        "histTrend": 0.029,
+        "histVolatility": 0.045,
+        "currentWeightedRate": 0.72,
+        "seniority": 3.1,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.17",
+          "text": "Thực đạt kỳ này đạt 72.0% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 74.1%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.1 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-042": {
+      "employeeId": "EMP-042",
+      "name": "Hồ Hồng Nam",
+      "rML": 0.945,
+      "intervalP10": 0.862,
+      "intervalP90": 1.028,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.916,
+        "histTrend": -0.033,
+        "histVolatility": 0.069,
+        "currentWeightedRate": 0.905,
+        "seniority": 4.2,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 90.5% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.2 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-043": {
+      "employeeId": "EMP-043",
+      "name": "Hoàng Kim Phúc",
+      "rML": 0.898,
+      "intervalP10": 0.836,
+      "intervalP90": 0.96,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.875,
+        "histTrend": 0.037,
+        "histVolatility": 0.052,
+        "currentWeightedRate": 0.867,
+        "seniority": 2.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.08",
+          "text": "Thực đạt kỳ này đạt 86.7% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 87.5%)."
+        }
+      ]
+    },
+    "EMP-044": {
+      "employeeId": "EMP-044",
+      "name": "Huỳnh Đức Hà",
+      "rML": 0.788,
+      "intervalP10": 0.748,
+      "intervalP90": 0.828,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.719,
+        "histTrend": -0.004,
+        "histVolatility": 0.02,
+        "currentWeightedRate": 0.755,
+        "seniority": 4.3,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.15",
+          "text": "Thực đạt kỳ này đạt 75.5% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 71.9%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.3 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-045": {
+      "employeeId": "EMP-045",
+      "name": "Đỗ Ngọc Trang",
+      "rML": 0.931,
+      "intervalP10": 0.876,
+      "intervalP90": 0.986,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.868,
+        "histTrend": -0.042,
+        "histVolatility": 0.046,
+        "currentWeightedRate": 0.882,
+        "seniority": 5.9,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 88.2% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 86.8%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5.9 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-046": {
+      "employeeId": "EMP-046",
+      "name": "Dương Kim Long",
+      "rML": 0.936,
+      "intervalP10": 0.873,
+      "intervalP90": 0.999,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.918,
+        "histTrend": 0.031,
+        "histVolatility": 0.052,
+        "currentWeightedRate": 0.885,
+        "seniority": 3.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 88.5% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.8 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-047": {
+      "employeeId": "EMP-047",
+      "name": "Ngô Hồng Việt",
+      "rML": 0.784,
+      "intervalP10": 0.743,
+      "intervalP90": 0.825,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.738,
+        "histTrend": -0.027,
+        "histVolatility": 0.034,
+        "currentWeightedRate": 0.749,
+        "seniority": 4.2,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.15",
+          "text": "Thực đạt kỳ này đạt 74.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 73.8%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.2 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-048": {
+      "employeeId": "EMP-048",
+      "name": "Phan Bảo Hưng",
+      "rML": 0.901,
+      "intervalP10": 0.842,
+      "intervalP90": 0.96,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.882,
+        "histTrend": 0.007,
+        "histVolatility": 0.049,
+        "currentWeightedRate": 0.881,
+        "seniority": 1.8,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 88.1% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 88.2%)."
+        }
+      ]
+    },
+    "EMP-049": {
+      "employeeId": "EMP-049",
+      "name": "Trần Hải Thảo",
+      "rML": 0.925,
+      "intervalP10": 0.871,
+      "intervalP90": 0.979,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 0.878,
+        "histTrend": 0.034,
+        "histVolatility": 0.045,
+        "currentWeightedRate": 0.853,
+        "seniority": 6.6,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.09",
+          "text": "Thực đạt kỳ này đạt 85.3% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 87.8%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.6 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-050": {
+      "employeeId": "EMP-050",
+      "name": "Trương Văn Thắng",
+      "rML": 0.811,
+      "intervalP10": 0.771,
+      "intervalP90": 0.851,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.79,
+        "histTrend": -0.01,
+        "histVolatility": 0.023,
+        "currentWeightedRate": 0.807,
+        "seniority": 1,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.12",
+          "text": "Thực đạt kỳ này đạt 80.7% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 79.0%)."
+        }
+      ]
+    },
+    "EMP-051": {
+      "employeeId": "EMP-051",
+      "name": "Lê Văn Quang",
+      "rML": 0.798,
+      "intervalP10": 0.758,
+      "intervalP90": 0.838,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.797,
+        "histTrend": -0.018,
+        "histVolatility": 0.033,
+        "currentWeightedRate": 0.778,
+        "seniority": 1.8,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.13",
+          "text": "Thực đạt kỳ này đạt 77.8% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 79.7%)."
+        }
+      ]
+    },
+    "EMP-052": {
+      "employeeId": "EMP-052",
+      "name": "Võ Văn Quang",
+      "rML": 0.946,
+      "intervalP10": 0.906,
+      "intervalP90": 0.986,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.885,
+        "histTrend": -0.013,
+        "histVolatility": 0.021,
+        "currentWeightedRate": 0.906,
+        "seniority": 4.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 90.6% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 88.5%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.7 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-053": {
+      "employeeId": "EMP-053",
+      "name": "Lê Ngọc Mai",
+      "rML": 0.948,
+      "intervalP10": 0.902,
+      "intervalP90": 0.994,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 0.923,
+        "histTrend": 0.013,
+        "histVolatility": 0.038,
+        "currentWeightedRate": 0.874,
+        "seniority": 6.3,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.08",
+          "text": "Thực đạt kỳ này đạt 87.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.3 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-054": {
+      "employeeId": "EMP-054",
+      "name": "Phạm Tuấn Anh",
+      "rML": 0.953,
+      "intervalP10": 0.875,
+      "intervalP90": 1.031,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.913,
+        "histTrend": 0.003,
+        "histVolatility": 0.065,
+        "currentWeightedRate": 0.933,
+        "seniority": 2.5,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 93.3% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-055": {
+      "employeeId": "EMP-055",
+      "name": "Nguyễn Quốc Trang",
+      "rML": 0.825,
+      "intervalP10": 0.762,
+      "intervalP90": 0.888,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.805,
+        "histTrend": -0.007,
+        "histVolatility": 0.053,
+        "currentWeightedRate": 0.796,
+        "seniority": 2.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.12",
+          "text": "Thực đạt kỳ này đạt 79.6% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 80.5%)."
+        }
+      ]
+    },
+    "EMP-056": {
+      "employeeId": "EMP-056",
+      "name": "Phạm Ngọc Linh",
+      "rML": 0.922,
+      "intervalP10": 0.882,
+      "intervalP90": 0.962,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.912,
+        "histTrend": 0.017,
+        "histVolatility": 0.03,
+        "currentWeightedRate": 0.895,
+        "seniority": 2,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.06",
+          "text": "Thực đạt kỳ này đạt 89.5% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-057": {
+      "employeeId": "EMP-057",
+      "name": "Đặng Thị Trang",
+      "rML": 0.868,
+      "intervalP10": 0.828,
+      "intervalP90": 0.908,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.832,
+        "histTrend": -0.003,
+        "histVolatility": 0.03,
+        "currentWeightedRate": 0.844,
+        "seniority": 2.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.09",
+          "text": "Thực đạt kỳ này đạt 84.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 83.2%)."
+        }
+      ]
+    },
+    "EMP-058": {
+      "employeeId": "EMP-058",
+      "name": "Nguyễn Ngọc Linh",
+      "rML": 0.868,
+      "intervalP10": 0.828,
+      "intervalP90": 0.908,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.836,
+        "histTrend": 0.012,
+        "histVolatility": 0.022,
+        "currentWeightedRate": 0.796,
+        "seniority": 6.1,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.12",
+          "text": "Thực đạt kỳ này đạt 79.6% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 83.6%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.1 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-059": {
+      "employeeId": "EMP-059",
+      "name": "Đỗ Minh Trang",
+      "rML": 0.874,
+      "intervalP10": 0.834,
+      "intervalP90": 0.914,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.853,
+        "histTrend": 0.015,
+        "histVolatility": 0.023,
+        "currentWeightedRate": 0.869,
+        "seniority": 0.7,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.08",
+          "text": "Thực đạt kỳ này đạt 86.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 85.3%)."
+        }
+      ]
+    },
+    "EMP-060": {
+      "employeeId": "EMP-060",
+      "name": "Lê Thị Thảo",
+      "rML": 0.873,
+      "intervalP10": 0.817,
+      "intervalP90": 0.929,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.854,
+        "histTrend": -0.012,
+        "histVolatility": 0.047,
+        "currentWeightedRate": 0.847,
+        "seniority": 2.6,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.09",
+          "text": "Thực đạt kỳ này đạt 84.7% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 85.4%)."
+        }
+      ]
+    },
+    "EMP-061": {
+      "employeeId": "EMP-061",
+      "name": "Bùi Tuấn Quân",
+      "rML": 0.845,
+      "intervalP10": 0.805,
+      "intervalP90": 0.885,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.811,
+        "histTrend": 0.007,
+        "histVolatility": 0.012,
+        "currentWeightedRate": 0.813,
+        "seniority": 3.1,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.11",
+          "text": "Thực đạt kỳ này đạt 81.3% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 81.1%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.1 năm tại vị trí Chuyên viên Kinh doanh Cấp 2 thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-062": {
+      "employeeId": "EMP-062",
+      "name": "Huỳnh Đức Tùng",
+      "rML": 0.908,
+      "intervalP10": 0.845,
+      "intervalP90": 0.971,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.865,
+        "histTrend": 0.013,
+        "histVolatility": 0.053,
+        "currentWeightedRate": 0.885,
+        "seniority": 2.6,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 88.5% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 86.5%)."
+        }
+      ]
+    },
+    "EMP-063": {
+      "employeeId": "EMP-063",
+      "name": "Dương Đức Bình",
+      "rML": 0.871,
+      "intervalP10": 0.814,
+      "intervalP90": 0.928,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.867,
+        "histTrend": -0.02,
+        "histVolatility": 0.048,
+        "currentWeightedRate": 0.859,
+        "seniority": 1.3,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.08",
+          "text": "Thực đạt kỳ này đạt 85.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 86.7%)."
+        }
+      ]
+    },
+    "EMP-064": {
+      "employeeId": "EMP-064",
+      "name": "Lê Ngọc Quân",
+      "rML": 0.916,
+      "intervalP10": 0.849,
+      "intervalP90": 0.983,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 0.891,
+        "histTrend": 0.015,
+        "histVolatility": 0.056,
+        "currentWeightedRate": 0.889,
+        "seniority": 2.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 88.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 89.1%)."
+        }
+      ]
+    },
+    "EMP-065": {
+      "employeeId": "EMP-065",
+      "name": "Phan Kim Mai",
+      "rML": 0.764,
+      "intervalP10": 0.709,
+      "intervalP90": 0.819,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.739,
+        "histTrend": 0.033,
+        "histVolatility": 0.046,
+        "currentWeightedRate": 0.709,
+        "seniority": 4.2,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.17",
+          "text": "Thực đạt kỳ này đạt 70.9% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 73.9%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.2 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-066": {
+      "employeeId": "EMP-066",
+      "name": "Đinh Bảo Cường",
+      "rML": 0.914,
+      "intervalP10": 0.873,
+      "intervalP90": 0.955,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.896,
+        "histTrend": -0.008,
+        "histVolatility": 0.034,
+        "currentWeightedRate": 0.857,
+        "seniority": 4.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.09",
+          "text": "Thực đạt kỳ này đạt 85.7% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 89.5%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.8 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-067": {
+      "employeeId": "EMP-067",
+      "name": "Phan Đức Nam",
+      "rML": 0.854,
+      "intervalP10": 0.788,
+      "intervalP90": 0.92,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 0.807,
+        "histTrend": 0.035,
+        "histVolatility": 0.055,
+        "currentWeightedRate": 0.803,
+        "seniority": 4.4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.12",
+          "text": "Thực đạt kỳ này đạt 80.3% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 80.7%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.4 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-068": {
+      "employeeId": "EMP-068",
+      "name": "Phan Văn Cường",
+      "rML": 0.974,
+      "intervalP10": 0.905,
+      "intervalP90": 1.043,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 0.921,
+        "histTrend": -0.032,
+        "histVolatility": 0.058,
+        "currentWeightedRate": 0.918,
+        "seniority": 6.8,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 91.8% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.8 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-069": {
+      "employeeId": "EMP-069",
+      "name": "Dương Bảo Tâm",
+      "rML": 0.898,
+      "intervalP10": 0.823,
+      "intervalP90": 0.973,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.822,
+        "histTrend": 0.004,
+        "histVolatility": 0.063,
+        "currentWeightedRate": 0.842,
+        "seniority": 6.3,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.09",
+          "text": "Thực đạt kỳ này đạt 84.2% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 82.2%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.3 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-070": {
+      "employeeId": "EMP-070",
+      "name": "Hồ Bảo Cường",
+      "rML": 0.928,
+      "intervalP10": 0.887,
+      "intervalP90": 0.969,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.893,
+        "histTrend": 0.029,
+        "histVolatility": 0.034,
+        "currentWeightedRate": 0.884,
+        "seniority": 3.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 88.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 89.3%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.8 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-071": {
+      "employeeId": "EMP-071",
+      "name": "Vũ Hải Quang",
+      "rML": 0.886,
+      "intervalP10": 0.826,
+      "intervalP90": 0.946,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.883,
+        "histTrend": -0.046,
+        "histVolatility": 0.05,
+        "currentWeightedRate": 0.874,
+        "seniority": 1.7,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.08",
+          "text": "Thực đạt kỳ này đạt 87.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 88.3%)."
+        }
+      ]
+    },
+    "EMP-072": {
+      "employeeId": "EMP-072",
+      "name": "Đỗ Thanh Mai",
+      "rML": 0.825,
+      "intervalP10": 0.784,
+      "intervalP90": 0.866,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.801,
+        "histTrend": -0.017,
+        "histVolatility": 0.034,
+        "currentWeightedRate": 0.794,
+        "seniority": 3.2,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.12",
+          "text": "Thực đạt kỳ này đạt 79.4% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 80.1%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.2 năm tại vị trí Chuyên viên Kinh doanh Cấp 2 thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-073": {
+      "employeeId": "EMP-073",
+      "name": "Trần Hồng Thảo",
+      "rML": 0.929,
+      "intervalP10": 0.889,
+      "intervalP90": 0.969,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.888,
+        "histTrend": 0.022,
+        "histVolatility": 0.031,
+        "currentWeightedRate": 0.896,
+        "seniority": 3.2,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.06",
+          "text": "Thực đạt kỳ này đạt 89.6% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 88.8%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.2 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-074": {
+      "employeeId": "EMP-074",
+      "name": "Bùi Thanh Khánh",
+      "rML": 0.777,
+      "intervalP10": 0.72,
+      "intervalP90": 0.834,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.724,
+        "histTrend": -0.031,
+        "histVolatility": 0.047,
+        "currentWeightedRate": 0.721,
+        "seniority": 6.7,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.17",
+          "text": "Thực đạt kỳ này đạt 72.1% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 72.4%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.7 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-075": {
+      "employeeId": "EMP-075",
+      "name": "Trương Bảo Hưng",
+      "rML": 0.95,
+      "intervalP10": 0.91,
+      "intervalP90": 0.99,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.876,
+        "histTrend": -0.003,
+        "histVolatility": 0.027,
+        "currentWeightedRate": 0.915,
+        "seniority": 4.5,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 91.5% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 87.6%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.5 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-076": {
+      "employeeId": "EMP-076",
+      "name": "Hoàng Bảo Anh",
+      "rML": 1.303,
+      "intervalP10": 1.227,
+      "intervalP90": 1.379,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.198,
+        "histTrend": -0.004,
+        "histVolatility": 0.064,
+        "currentWeightedRate": 1.176,
+        "seniority": 6.6,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.11",
+          "text": "Thực đạt kỳ này đạt 117.6% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 119.8%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.6 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-077": {
+      "employeeId": "EMP-077",
+      "name": "Đinh Ngọc Giang",
+      "rML": 1.056,
+      "intervalP10": 0.978,
+      "intervalP90": 1.134,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 0.985,
+        "histTrend": -0.014,
+        "histVolatility": 0.065,
+        "currentWeightedRate": 1.004,
+        "seniority": 5,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 100.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-078": {
+      "employeeId": "EMP-078",
+      "name": "Hồ Tuấn Quang",
+      "rML": 1.129,
+      "intervalP10": 1.028,
+      "intervalP90": 1.23,
+      "confidence": 0.9,
+      "features": {
+        "histAvgRate": 1.081,
+        "histTrend": 0.069,
+        "histVolatility": 0.084,
+        "currentWeightedRate": 1.05,
+        "seniority": 2.8,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 105.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 108.0%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-079": {
+      "employeeId": "EMP-079",
+      "name": "Dương Gia Tâm",
+      "rML": 1.292,
+      "intervalP10": 1.223,
+      "intervalP90": 1.361,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 1.21,
+        "histTrend": 0.011,
+        "histVolatility": 0.057,
+        "currentWeightedRate": 1.189,
+        "seniority": 3.1,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.11",
+          "text": "Thực đạt kỳ này đạt 118.9% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 121.0%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.1 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-080": {
+      "employeeId": "EMP-080",
+      "name": "Huỳnh Đức Nam",
+      "rML": 1.129,
+      "intervalP10": 1.053,
+      "intervalP90": 1.205,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.068,
+        "histTrend": 0.055,
+        "histVolatility": 0.063,
+        "currentWeightedRate": 1.064,
+        "seniority": 2.6,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 106.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 106.8%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-081": {
+      "employeeId": "EMP-081",
+      "name": "Hồ Ngọc Linh",
+      "rML": 1.262,
+      "intervalP10": 1.179,
+      "intervalP90": 1.345,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.16,
+        "histTrend": 0.033,
+        "histVolatility": 0.07,
+        "currentWeightedRate": 1.166,
+        "seniority": 4,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.10",
+          "text": "Thực đạt kỳ này đạt 116.6% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 116.0%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-082": {
+      "employeeId": "EMP-082",
+      "name": "Hồ Ngọc Trang",
+      "rML": 1.117,
+      "intervalP10": 1.077,
+      "intervalP90": 1.157,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.029,
+        "histTrend": 0.001,
+        "histVolatility": 0.016,
+        "currentWeightedRate": 1.1,
+        "seniority": 1.5,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.06",
+          "text": "Thực đạt kỳ này đạt 110.0% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-083": {
+      "employeeId": "EMP-083",
+      "name": "Võ Kim Anh",
+      "rML": 1.109,
+      "intervalP10": 1.021,
+      "intervalP90": 1.197,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 1.035,
+        "histTrend": 0.041,
+        "histVolatility": 0.073,
+        "currentWeightedRate": 1.051,
+        "seniority": 3.5,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 105.1% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.5 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-084": {
+      "employeeId": "EMP-084",
+      "name": "Đỗ Minh Đạt",
+      "rML": 1.149,
+      "intervalP10": 1.109,
+      "intervalP90": 1.189,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.066,
+        "histTrend": -0.011,
+        "histVolatility": 0.034,
+        "currentWeightedRate": 1.06,
+        "seniority": 6.5,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 106.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 106.6%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.5 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-085": {
+      "employeeId": "EMP-085",
+      "name": "Đặng Bảo Anh",
+      "rML": 1.237,
+      "intervalP10": 1.172,
+      "intervalP90": 1.302,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.164,
+        "histTrend": 0.002,
+        "histVolatility": 0.054,
+        "currentWeightedRate": 1.136,
+        "seniority": 4.1,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.08",
+          "text": "Thực đạt kỳ này đạt 113.6% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 116.4%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.1 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-086": {
+      "employeeId": "EMP-086",
+      "name": "Đặng Tuấn Mai",
+      "rML": 1.11,
+      "intervalP10": 1.054,
+      "intervalP90": 1.166,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.109,
+        "histTrend": -0.008,
+        "histVolatility": 0.046,
+        "currentWeightedRate": 1.029,
+        "seniority": 2.3,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 102.9% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 110.9%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-087": {
+      "employeeId": "EMP-087",
+      "name": "Nguyễn Thị Nam",
+      "rML": 1.129,
+      "intervalP10": 1.051,
+      "intervalP90": 1.207,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.057,
+        "histTrend": 0.023,
+        "histVolatility": 0.065,
+        "currentWeightedRate": 1.055,
+        "seniority": 4.3,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 105.5% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 105.7%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.3 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-088": {
+      "employeeId": "EMP-088",
+      "name": "Đặng Kim Dũng",
+      "rML": 1.237,
+      "intervalP10": 1.181,
+      "intervalP90": 1.293,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.17,
+        "histTrend": -0.003,
+        "histVolatility": 0.046,
+        "currentWeightedRate": 1.138,
+        "seniority": 3.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.08",
+          "text": "Thực đạt kỳ này đạt 113.8% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 117.0%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.7 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-089": {
+      "employeeId": "EMP-089",
+      "name": "Trần Thanh Cường",
+      "rML": 1.097,
+      "intervalP10": 1.055,
+      "intervalP90": 1.139,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.997,
+        "histTrend": 0.029,
+        "histVolatility": 0.035,
+        "currentWeightedRate": 1.044,
+        "seniority": 4.9,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 104.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.9 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-090": {
+      "employeeId": "EMP-090",
+      "name": "Hoàng Văn Phúc",
+      "rML": 1.116,
+      "intervalP10": 1.043,
+      "intervalP90": 1.189,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 1.058,
+        "histTrend": 0.025,
+        "histVolatility": 0.061,
+        "currentWeightedRate": 1.029,
+        "seniority": 4.9,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 102.9% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 105.8%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.9 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-091": {
+      "employeeId": "EMP-091",
+      "name": "Huỳnh Văn Hà",
+      "rML": 1.111,
+      "intervalP10": 1.026,
+      "intervalP90": 1.196,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.016,
+        "histTrend": -0.004,
+        "histVolatility": 0.071,
+        "currentWeightedRate": 1.049,
+        "seniority": 5.5,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 104.9% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5.5 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-092": {
+      "employeeId": "EMP-092",
+      "name": "Võ Kim Nhi",
+      "rML": 1.262,
+      "intervalP10": 1.169,
+      "intervalP90": 1.355,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 1.164,
+        "histTrend": 0.015,
+        "histVolatility": 0.078,
+        "currentWeightedRate": 1.172,
+        "seniority": 3.6,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.10",
+          "text": "Thực đạt kỳ này đạt 117.2% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 116.4%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.6 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-093": {
+      "employeeId": "EMP-093",
+      "name": "Đinh Hải Đạt",
+      "rML": 1.29,
+      "intervalP10": 1.236,
+      "intervalP90": 1.344,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 1.208,
+        "histTrend": -0.011,
+        "histVolatility": 0.045,
+        "currentWeightedRate": 1.178,
+        "seniority": 4.1,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.11",
+          "text": "Thực đạt kỳ này đạt 117.8% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 120.8%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.1 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-094": {
+      "employeeId": "EMP-094",
+      "name": "Hoàng Thị Tùng",
+      "rML": 1.28,
+      "intervalP10": 1.189,
+      "intervalP90": 1.371,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 1.193,
+        "histTrend": -0.024,
+        "histVolatility": 0.076,
+        "currentWeightedRate": 1.158,
+        "seniority": 5.7,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.09",
+          "text": "Thực đạt kỳ này đạt 115.8% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 119.2%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5.7 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-095": {
+      "employeeId": "EMP-095",
+      "name": "Đinh Minh Thắng",
+      "rML": 1.246,
+      "intervalP10": 1.174,
+      "intervalP90": 1.318,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 1.175,
+        "histTrend": 0.036,
+        "histVolatility": 0.06,
+        "currentWeightedRate": 1.167,
+        "seniority": 1.6,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.10",
+          "text": "Thực đạt kỳ này đạt 116.7% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 117.5%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-096": {
+      "employeeId": "EMP-096",
+      "name": "Hoàng Phương Phong",
+      "rML": 1.176,
+      "intervalP10": 1.074,
+      "intervalP90": 1.278,
+      "confidence": 0.9,
+      "features": {
+        "histAvgRate": 1.082,
+        "histTrend": 0.058,
+        "histVolatility": 0.085,
+        "currentWeightedRate": 1.1,
+        "seniority": 3.9,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 110.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 108.2%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.9 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-097": {
+      "employeeId": "EMP-097",
+      "name": "Bùi Minh Anh",
+      "rML": 1.141,
+      "intervalP10": 1.082,
+      "intervalP90": 1.2,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.086,
+        "histTrend": 0.019,
+        "histVolatility": 0.049,
+        "currentWeightedRate": 1.044,
+        "seniority": 4.9,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 104.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 108.6%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.9 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-098": {
+      "employeeId": "EMP-098",
+      "name": "Trần Hải Thắng",
+      "rML": 1.043,
+      "intervalP10": 0.982,
+      "intervalP90": 1.104,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.977,
+        "histTrend": 0.002,
+        "histVolatility": 0.051,
+        "currentWeightedRate": 1.007,
+        "seniority": 3.6,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 100.7% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.6 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-099": {
+      "employeeId": "EMP-099",
+      "name": "Phan Quốc Phúc",
+      "rML": 1.074,
+      "intervalP10": 1.008,
+      "intervalP90": 1.14,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 1.021,
+        "histTrend": 0.003,
+        "histVolatility": 0.055,
+        "currentWeightedRate": 1.035,
+        "seniority": 2.5,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 103.5% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        }
+      ]
+    },
+    "EMP-100": {
+      "employeeId": "EMP-100",
+      "name": "Hồ Thanh Tâm",
+      "rML": 1.225,
+      "intervalP10": 1.185,
+      "intervalP90": 1.265,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.095,
+        "histTrend": -0.008,
+        "histVolatility": 0.012,
+        "currentWeightedRate": 1.142,
+        "seniority": 6.5,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.08",
+          "text": "Thực đạt kỳ này đạt 114.2% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 109.5%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.5 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-101": {
+      "employeeId": "EMP-101",
+      "name": "Vũ Tuấn Yến",
+      "rML": 1.196,
+      "intervalP10": 1.135,
+      "intervalP90": 1.257,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.162,
+        "histTrend": -0.03,
+        "histVolatility": 0.051,
+        "currentWeightedRate": 1.122,
+        "seniority": 1.5,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.07",
+          "text": "Thực đạt kỳ này đạt 112.2% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 116.2%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-102": {
+      "employeeId": "EMP-102",
+      "name": "Đinh Đức Quân",
+      "rML": 1.12,
+      "intervalP10": 1.047,
+      "intervalP90": 1.193,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 1.074,
+        "histTrend": -0.016,
+        "histVolatility": 0.061,
+        "currentWeightedRate": 1.064,
+        "seniority": 2.5,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 106.4% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 107.4%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-103": {
+      "employeeId": "EMP-103",
+      "name": "Huỳnh Hồng Tùng",
+      "rML": 1.145,
+      "intervalP10": 1.094,
+      "intervalP90": 1.196,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 1.053,
+        "histTrend": -0.002,
+        "histVolatility": 0.042,
+        "currentWeightedRate": 1.062,
+        "seniority": 6,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 106.2% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 105.3%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-104": {
+      "employeeId": "EMP-104",
+      "name": "Đặng Gia Đạt",
+      "rML": 1.178,
+      "intervalP10": 1.099,
+      "intervalP90": 1.257,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.125,
+        "histTrend": -0.033,
+        "histVolatility": 0.066,
+        "currentWeightedRate": 1.104,
+        "seniority": 2.9,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.06",
+          "text": "Thực đạt kỳ này đạt 110.4% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 112.5%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-105": {
+      "employeeId": "EMP-105",
+      "name": "Phan Bảo Long",
+      "rML": 1.14,
+      "intervalP10": 1.075,
+      "intervalP90": 1.205,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.089,
+        "histTrend": -0.021,
+        "histVolatility": 0.054,
+        "currentWeightedRate": 1.06,
+        "seniority": 4.1,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 106.0% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 108.9%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.1 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-106": {
+      "employeeId": "EMP-106",
+      "name": "Đặng Bảo Vinh",
+      "rML": 1.454,
+      "intervalP10": 1.395,
+      "intervalP90": 1.5,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 1.363,
+        "histTrend": 0.04,
+        "histVolatility": 0.049,
+        "currentWeightedRate": 1.314,
+        "seniority": 1.8,
+        "jobLevel": 1
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.19",
+          "text": "Thực đạt kỳ này đạt 131.4% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 136.3%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-107": {
+      "employeeId": "EMP-107",
+      "name": "Đinh Đức Sơn",
+      "rML": 1.384,
+      "intervalP10": 1.3,
+      "intervalP90": 1.468,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.248,
+        "histTrend": 0.02,
+        "histVolatility": 0.07,
+        "currentWeightedRate": 1.246,
+        "seniority": 6.6,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.15",
+          "text": "Thực đạt kỳ này đạt 124.6% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 124.8%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.6 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-108": {
+      "employeeId": "EMP-108",
+      "name": "Bùi Hải Quân",
+      "rML": 1.445,
+      "intervalP10": 1.353,
+      "intervalP90": 1.5,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 1.28,
+        "histTrend": 0.035,
+        "histVolatility": 0.077,
+        "currentWeightedRate": 1.319,
+        "seniority": 4.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.19",
+          "text": "Thực đạt kỳ này đạt 131.9% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 128.0%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.8 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-109": {
+      "employeeId": "EMP-109",
+      "name": "Trần Ngọc Quân",
+      "rML": 1.5,
+      "intervalP10": 1.46,
+      "intervalP90": 1.5,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.316,
+        "histTrend": -0.005,
+        "histVolatility": 0.031,
+        "currentWeightedRate": 1.392,
+        "seniority": 3.8,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.23",
+          "text": "Thực đạt kỳ này đạt 139.2% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 131.6%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.8 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-110": {
+      "employeeId": "EMP-110",
+      "name": "Trương Kim Giang",
+      "rML": 1.367,
+      "intervalP10": 1.327,
+      "intervalP90": 1.407,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 1.238,
+        "histTrend": -0.024,
+        "histVolatility": 0.03,
+        "currentWeightedRate": 1.238,
+        "seniority": 6.3,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.14",
+          "text": "Thực đạt kỳ này đạt 123.8% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 123.8%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.3 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-111": {
+      "employeeId": "EMP-111",
+      "name": "Đặng Bảo Long",
+      "rML": 1.5,
+      "intervalP10": 1.454,
+      "intervalP90": 1.5,
+      "confidence": 0.95,
+      "features": {
+        "histAvgRate": 1.507,
+        "histTrend": 0.025,
+        "histVolatility": 0.038,
+        "currentWeightedRate": 1.339,
+        "seniority": 3.3,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.20",
+          "text": "Thực đạt kỳ này đạt 133.9% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 150.7%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.3 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-112": {
+      "employeeId": "EMP-112",
+      "name": "Bùi Tuấn Vinh",
+      "rML": 1.306,
+      "intervalP10": 1.215,
+      "intervalP90": 1.397,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 1.202,
+        "histTrend": 0.001,
+        "histVolatility": 0.076,
+        "currentWeightedRate": 1.22,
+        "seniority": 2.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.13",
+          "text": "Thực đạt kỳ này đạt 122.0% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 120.2%), tăng thêm điểm tín nhiệm."
+        }
+      ]
+    },
+    "EMP-113": {
+      "employeeId": "EMP-113",
+      "name": "Hoàng Thị Anh",
+      "rML": 1.5,
+      "intervalP10": 1.41,
+      "intervalP90": 1.5,
+      "confidence": 0.91,
+      "features": {
+        "histAvgRate": 1.442,
+        "histTrend": 0.054,
+        "histVolatility": 0.075,
+        "currentWeightedRate": 1.393,
+        "seniority": 3.9,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.24",
+          "text": "Thực đạt kỳ này đạt 139.3% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 144.2%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.9 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-114": {
+      "employeeId": "EMP-114",
+      "name": "Hoàng Ngọc Mai",
+      "rML": 1.354,
+      "intervalP10": 1.287,
+      "intervalP90": 1.421,
+      "confidence": 0.93,
+      "features": {
+        "histAvgRate": 1.244,
+        "histTrend": -0.023,
+        "histVolatility": 0.056,
+        "currentWeightedRate": 1.236,
+        "seniority": 4.6,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.14",
+          "text": "Thực đạt kỳ này đạt 123.6% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 124.4%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.6 năm tại vị trí Giám sát Hoạt động Phân phối thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-115": {
+      "employeeId": "EMP-115",
+      "name": "Hồ Kim Cường",
+      "rML": 1.391,
+      "intervalP10": 1.291,
+      "intervalP90": 1.491,
+      "confidence": 0.9,
+      "features": {
+        "histAvgRate": 1.307,
+        "histTrend": 0.059,
+        "histVolatility": 0.083,
+        "currentWeightedRate": 1.213,
+        "seniority": 5.6,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.13",
+          "text": "Thực đạt kỳ này đạt 121.3% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 130.7%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 5.6 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-116": {
+      "employeeId": "EMP-116",
+      "name": "Vũ Phương Yến",
+      "rML": 1.5,
+      "intervalP10": 1.46,
+      "intervalP90": 1.5,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0,
+        "histTrend": 0,
+        "histVolatility": 0,
+        "currentWeightedRate": 450,
+        "seniority": 6.2,
+        "jobLevel": 4
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+269.40",
+          "text": "Thực đạt kỳ này đạt 45000.0% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 0.0%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 6.2 năm tại vị trí Trưởng nhóm Kinh doanh thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-117": {
+      "employeeId": "EMP-117",
+      "name": "Huỳnh Ngọc Dũng",
+      "rML": 1.096,
+      "intervalP10": 1.012,
+      "intervalP90": 1.18,
+      "confidence": 0.92,
+      "features": {
+        "histAvgRate": 1.022,
+        "histTrend": 0.038,
+        "histVolatility": 0.07,
+        "currentWeightedRate": 1.035,
+        "seniority": 4.1,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.05",
+          "text": "Thực đạt kỳ này đạt 103.5% bám sát mục tiêu giao kết."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.02",
+          "text": "Phong độ các kỳ trước ổn định quanh mốc 100%."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.1 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-118": {
+      "employeeId": "EMP-118",
+      "name": "Đinh Hồng Thảo",
+      "rML": 1.5,
+      "intervalP10": 1.38,
+      "intervalP90": 1.5,
+      "confidence": 0.88,
+      "features": {
+        "histAvgRate": 2.967,
+        "histTrend": 0.023,
+        "histVolatility": 0.106,
+        "currentWeightedRate": 1.5,
+        "seniority": 4.2,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "+0.30",
+          "text": "Thực đạt kỳ này đạt 150.0% vượt mức chỉ tiêu, là nhân tố đóng góp dương mạnh nhất."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "+0.08",
+          "text": "Hiệu suất 4 kỳ trước duy trì ở mức cao (trung bình 296.7%), tăng thêm điểm tín nhiệm."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 4.2 năm tại vị trí Chuyên viên Tư vấn Doanh nghiệp thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-119": {
+      "employeeId": "EMP-119",
+      "name": "Nguyễn Hải Long",
+      "rML": 0.699,
+      "intervalP10": 0.659,
+      "intervalP90": 0.739,
+      "confidence": 0.96,
+      "features": {
+        "histAvgRate": 0.664,
+        "histTrend": 0.005,
+        "histVolatility": 0.026,
+        "currentWeightedRate": 0.66,
+        "seniority": 3.7,
+        "jobLevel": 3
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.20",
+          "text": "Thực đạt kỳ này đạt 66.0% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 66.3%)."
+        },
+        {
+          "feature": "seniority",
+          "impact": "+0.03",
+          "text": "Thâm niên 3.7 năm tại vị trí Quản lý Khách hàng Khu vực thuộc nhóm kinh nghiệm cao."
+        }
+      ]
+    },
+    "EMP-120": {
+      "employeeId": "EMP-120",
+      "name": "Phạm Văn Giang",
+      "rML": 0.924,
+      "intervalP10": 0.864,
+      "intervalP90": 0.984,
+      "confidence": 0.94,
+      "features": {
+        "histAvgRate": 0.899,
+        "histTrend": 0.037,
+        "histVolatility": 0.05,
+        "currentWeightedRate": 0.89,
+        "seniority": 2.6,
+        "jobLevel": 2
+      },
+      "topDrivers": [
+        {
+          "feature": "current_weighted_rate",
+          "impact": "-0.07",
+          "text": "Thực đạt kỳ này đạt 89.0% dưới chuẩn, kéo giảm mức đề xuất của mô hình."
+        },
+        {
+          "feature": "hist_avg_rate",
+          "impact": "-0.06",
+          "text": "Lịch sử 4 kỳ trước có nhiều biến động (trung bình 89.9%)."
+        }
+      ]
+    }
+  }
+}

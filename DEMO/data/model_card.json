@@ -1,0 +1,37 @@
+{
+  "modelName": "Incentive-Predictor-GBR-v2",
+  "version": "2.0.0",
+  "algorithm": "Gradient Boosting Regressor with Quantile Prediction Intervals",
+  "framework": "Scikit-learn / Node Simulation Dual Stack",
+  "trainedRecords": 480,
+  "featuresUsed": [
+    "Tỷ lệ đạt có trọng số kỳ hiện tại (current_weighted_rate)",
+    "Tỷ lệ đạt trung bình 4 kỳ trước (hist_avg_rate)",
+    "Độ dốc xu hướng hoàn thành theo thời gian (hist_rate_trend)",
+    "Độ lệch chuẩn biến động hiệu suất (hist_volatility)",
+    "Thâm niên công tác (seniority)",
+    "Cấp bậc chuyên môn (job_level)",
+    "Tổng quy mô các gói việc đảm nhận (total_work_volume)"
+  ],
+  "featuresExcludedForFairness": [
+    "Giới tính (Gender)",
+    "Độ tuổi (Age)",
+    "Tình trạng hôn nhân (Marital Status)",
+    "Dân tộc & Quê quán",
+    "Quan hệ cá nhân với lãnh đạo"
+  ],
+  "metrics": {
+    "mae": 0.031,
+    "rmse": 0.045,
+    "r2Score": 0.892,
+    "p10Coverage": 0.82
+  },
+  "fairnessAudit": {
+    "departmentParity": "Độ lệch chuẩn giữa các phòng ban: 0.024 (Rất đồng đều)",
+    "disparateImpactRatio": 0.96,
+    "status": "PASSED"
+  },
+  "intendedUse": "Hỗ trợ Quản lý trực tiếp và Hội đồng C&B tham khảo mức thưởng khách quan dựa trên năng lực và lịch sử, không dùng để tự động quyết định chi trả.",
+  "limitations": "Nhãn dữ liệu lịch sử là mô phỏng toán học có kiểm soát do tính chất bảo mật lương thưởng doanh nghiệp. Không áp dụng cho nhân sự thử việc dưới 3 tháng.",
+  "exportTimestamp": "2026-09-20T11:15:26.228Z"
+}
