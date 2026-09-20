@@ -1,0 +1,26 @@
+/* Tùy chỉnh thanh cuộn đẹp mắt cho VS Code / Webkit */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Class trạng thái tùy chỉnh */
+.badge-valid {
+    @apply inline-flex items-center gap-1 text-emerald-600 font-medium;
+}
+.badge-warning {
+    @apply inline-flex items-center gap-1 text-amber-600 font-medium;
+}
+.badge-error {
+    @apply inline-flex items-center gap-1 text-rose-600 font-medium;
+}

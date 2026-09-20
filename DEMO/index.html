@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incentive Management & Analytics Prototype (Live CSV Data)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- PapaParse CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0">
+        <div>
+            <div class="h-16 flex items-center gap-3 px-6 bg-slate-950 font-bold text-lg text-white border-b border-slate-800">
+                <i class="fa-solid fa-chart-line text-indigo-500 text-xl"></i>
+                <span>Incentive Analytics</span>
+            </div>
+
+            
+
+            <!-- TAB NAVIGATION BUTTONS -->
+            <nav class="p-4 space-y-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-indigo-600 font-medium shadow-sm transition">
+                    <i class="fa-solid fa-house w-5"></i> Dashboard Tổng Quan
+                </button>
+                <button onclick="switchTab('task1')" id="nav-task1" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-calculator w-5"></i> Task 1: Tính Tự Động
+                </button>
+                <button onclick="switchTab('task2')" id="nav-task2" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-shield-halved w-5"></i> Task 2: Cảnh Báo Lỗi
+                    <span id="badge-alert-count" class="ml-auto bg-amber-500 text-slate-950 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button onclick="switchTab('task3')" id="nav-task3" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Task 3: Tối Ưu Scheme
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white">HR</div>
+            <div class="text-xs">
+                <p class="font-semibold text-white">Garment Analytics</p>
+                <p id="sidebar-dataset-info" class="text-slate-400">Chưa nạp dữ liệu</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col overflow-y-auto">
+        <header class="bg-white border-b border-slate-200 h-16 px-8 flex items-center justify-between sticky top-0 z-10">
+            <div>
+                <h1 id="page-title" class="text-xl font-bold text-slate-900">Dashboard Tổng Quan Incentive</h1>
+                <p id="data-status-text" class="text-xs text-slate-500">Đang khởi tạo ứng dụng...</p>
+            </div>
+            <div class="flex gap-3">
+                <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                <button onclick="document.getElementById('csv-file-input').click()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 text-slate-700">
+                    <i class="fa-solid fa-file-csv mr-2 text-emerald-600"></i> Nạp File CSV Khác
+                </button>
+                <button id="btn-reload-data" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+                    <i class="fa-solid fa-rotate mr-2"></i> Chạy Automation Xử Lý
+                </button>
+            </div>
+        </header>
+
+        <div class="p-8">
+
+            <!-- VIEW 1: DASHBOARD TỔNG QUAN -->
+            <div id="view-dashboard" class="tab-view space-y-8">
+                <!-- KPI Cards (Tạo hoàn toàn bằng JS) -->
+                <section class="grid grid-cols-1 md:grid-cols-4 gap-6" id="kpi-cards"></section>
+
+                <!-- Tóm tắt 3 Task trên Dashboard -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <h3 class="font-bold text-slate-900"><i class="fa-solid fa-calculator text-indigo-500 mr-2"></i>Task 1: Tiến Độ Tính Thưởng</h3>
+                            <button onclick="switchTab('task1')" class="text-xs text-indigo-600 font-bold hover:underline">Xem Chi Tiết &rarr;</button>
+                        </div>
+                        <p class="text-xs text-slate-500">Đã tự động tính toán cho <strong id="dash-total-rows">0</strong> bản ghi từ file CSV.</p>
+                        <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+                            <div class="flex justify-between"><span>Số ca đạt Target:</span><strong id="dash-achieved-count" class="text-emerald-600">0</strong></div>
+                            <div class="flex justify-between"><span>Tổng chi phí thưởng:</span><strong id="dash-total-payout" class="text-slate-900">0</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <h3 class="font-bold text-slate-900"><i class="fa-solid fa-shield-halved text-amber-500 mr-2"></i>Task 2: Phát Hiện Lỗi Dữ Liệu</h3>
+                            <button onclick="switchTab('task2')" class="text-xs text-indigo-600 font-bold hover:underline">Xem Chi Tiết &rarr;</button>
+                        </div>
+                        <p class="text-xs text-slate-500">Thuật toán phát hiện <strong id="dash-total-anomalies" class="text-amber-600">0 ca bất thường</strong> cần HR & Manager phê duyệt.</p>
+                        <div id="dash-unearned-alert-box" class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 font-medium">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang tính toán dữ liệu lỗi...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: TASK 1 (TÍNH TOÁN TỰ ĐỘNG) -->
+            <div id="view-task1" class="tab-view hidden space-y-8">
+                <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                        <div>
+                            <h2 class="font-bold text-lg text-slate-900">Task 1: Kết Quả Tính Toán Incentive Tự Động</h2>
+                            <p class="text-xs text-slate-500">Công thức: Achievement Rate = Actual Productivity / Targeted Productivity</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="text-xs font-semibold text-slate-600">Lọc theo bộ phận:</label>
+                            <select id="filter-dept" class="text-xs border px-3 py-2 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="ALL">Tất cả Bộ Phận</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto max-h-[500px]">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-slate-50 border-b text-xs uppercase text-slate-500 font-semibold sticky top-0">
+                                <tr>
+                                    <th class="p-3">Ngày</th>
+                                    <th class="p-3">Bộ Phận</th>
+                                    <th class="p-3">Team</th>
+                                    <th class="p-3">Targeted Prod</th>
+                                    <th class="p-3">Actual Prod</th>
+                                    <th class="p-3">Achievement Rate</th>
+                                    <th class="p-3">Incentive Chi Trả</th>
+                                    <th class="p-3">Trạng Thái Validation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-table-body" class="divide-y text-slate-700 text-xs"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- VIEW 3: TASK 2 (CẢNH BÁO LỖI & MONITORING) -->
+            <div id="view-task2" class="tab-view hidden space-y-8">
+                <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                                Task 2: Chi Tiết Cảnh Báo Lỗi Dữ Liệu
+                            </h3>
+                        </div>
+                        <div id="validation-alerts" class="space-y-3 text-xs max-h-[450px] overflow-y-auto"></div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-900 flex items-center gap-2 border-b pb-3">
+                            <i class="fa-solid fa-chart-bar text-indigo-500"></i>
+                            Phân Loại Bất Thường Dữ Liệu
+                        </h3>
+                        <div id="anomaly-summary-box" class="space-y-3 text-xs"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- VIEW 4: TASK 3 (PHÂN TÍCH ANALYTICS & TỐI ƯU SCHEME) -->
+            <div id="view-task3" class="tab-view hidden space-y-8">
+                <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-4">
+                        <div>
+                            <h2 class="font-bold text-lg text-slate-900">Task 3: Phân Tích Thực Tế Tương Quan Thưởng vs Productivity</h2>
+                            <p class="text-xs text-slate-500">So sánh chỉ tiêu mong đợi (Targeted) và năng suất thực tế (Actual Productivity) theo từng nhóm thưởng</p>
+                        </div>
+                        <span class="bg-emerald-50 text-emerald-700 text-xs px-3 py-1 rounded-full font-semibold">Calculated CSV Analytics</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-slate-50 p-4 rounded-lg border">
+                            <h4 class="text-sm font-semibold mb-2 text-slate-700">Productivity Thực Tế vs Targeted Theo Khung Thưởng</h4>
+                            <div class="h-80">
+                                <canvas id="productivityChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 p-5 rounded-lg flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-amber-800 font-bold mb-2">
+                                    <i class="fa-solid fa-lightbulb text-amber-600 text-lg"></i>
+                                    <span>Tính Toán Tự Động Từ File CSV</span>
+                                </div>
+                                <ul id="task3-insights-list" class="text-xs text-slate-700 space-y-2 mt-2 list-disc list-inside leading-relaxed">
+                                    <!-- Dynamic elements from JS -->
+                                </ul>
+                                <div id="task3-recommendation" class="mt-4 p-3 bg-white rounded border border-amber-200 text-xs text-slate-800">
+                                    <!-- Dynamic text from JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JS Files -->
+    <script src="js/automation.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
