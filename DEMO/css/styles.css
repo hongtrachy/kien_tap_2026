@@ -278,3 +278,44 @@ body.privacy-masked .masked-amount {
     display: none;
   }
 }
+
+/* Custom Range Slider Styling (Refined Linear-style track and thumb) */
+input[type="range"]#whatif-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #E2E8F0;
+  height: 6px;
+  border-radius: 9999px;
+  outline: none;
+}
+input[type="range"]#whatif-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0E5A55;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+input[type="range"]#whatif-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: #083D39;
+}
+input[type="range"]#whatif-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0E5A55;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+/* Financial number formatting */
+.font-mono, [class*="masked-amount"], .tabular-nums {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}

@@ -462,7 +462,7 @@
       
       const periods = ['Q3/2025', 'Q4/2025', 'Q1/2026', 'Q2/2026', 'Q3/2026'];
       const pointRadii = periods.map(p => p === curPeriodStr ? 7 : 4);
-      const pointColors = periods.map(p => p === curPeriodStr ? '#fbbf24' : '#4f46e5');
+      const pointColors = periods.map(p => p === curPeriodStr ? '#0E5A55' : '#147A73');
 
       state.overviewChartInstance = new Chart(ctx, {
         type: 'line',
@@ -472,11 +472,11 @@
             {
               label: 'Tỷ lệ đạt chỉ tiêu (%)',
               data: [92.4, 96.8, 98.2, 95.5, 94.6],
-              borderColor: '#4f46e5',
-              backgroundColor: 'rgba(79, 70, 229, 0.1)',
-              borderWidth: 2,
+              borderColor: '#0E5A55',
+              backgroundColor: 'rgba(14, 90, 85, 0.08)',
+              borderWidth: 2.5,
               fill: true,
-              tension: 0.2,
+              tension: 0.25,
               pointRadius: pointRadii,
               pointBackgroundColor: pointColors
             },
@@ -539,7 +539,7 @@
           datasets: [{
             label: 'Tỷ lệ hoàn thành (%)',
             data: deptRates,
-            backgroundColor: ['#4f46e5', '#6366f1', '#0ea5e9', '#14b8a6'],
+            backgroundColor: ['#0E5A55', '#147A73', '#1F9D93', '#45B6AD'],
             borderRadius: 4
           }]
         },
@@ -600,7 +600,7 @@
         datasets: [{
           label: 'Số lượng nhân sự',
           data: [underFloor, partial, target, cap],
-          backgroundColor: ['#ef4444', '#f59e0b', '#4f46e5', '#10b981'],
+          backgroundColor: ['#f43f5e', '#f59e0b', '#0E5A55', '#059669'],
           borderRadius: 6,
           borderSkipped: false
         }]
@@ -902,25 +902,24 @@
 
         let statusBadge = '';
         if (emp.status === 'PENDING_ADMIN') {
-          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">Chờ duyệt</span>';
+          statusBadge = '<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200"><span class="w-1 h-1 rounded-full bg-amber-500"></span> Chờ duyệt</span>';
         } else if (emp.status === 'APPROVED') {
-          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">Đã duyệt</span>';
+          statusBadge = '<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200"><span class="w-1 h-1 rounded-full bg-emerald-500"></span> Đã duyệt</span>';
         } else if (emp.status === 'REJECTED') {
-          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-800">Từ chối</span>';
+          statusBadge = '<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200"><span class="w-1 h-1 rounded-full bg-rose-500"></span> Từ chối</span>';
         }
 
         return `
           <div onclick="selectRecEmployee('${emp.id}')" class="p-2.5 rounded-lg border cursor-pointer flex items-center justify-between text-xs transition ${activeClass}">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[10px]">${emp.avatar}</span>
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-[10px] shrink-0 border border-slate-200/60">${emp.avatar}</span>
               <div>
-                <div class="leading-tight">${emp.name}</div>
-                <div class="text-slate-400 text-[11px]">${emp.code}</div>
+                <div class="font-semibold text-slate-900 leading-tight">${emp.name}</div>
+                <div class="text-slate-400 font-mono text-[10px]">${emp.code}</div>
               </div>
             </div>
             <div class="text-right flex flex-col items-end gap-0.5">
-              <span class="font-bold text-slate-900">${IncentiveEngine.formatPercent(rates ? rates.displayedRate : 0, 1)}</span>
-              <span class="text-[10px] text-slate-400">mức thưởng</span>
+              <span class="font-bold font-mono text-slate-900 tabular-nums">${IncentiveEngine.formatPercent(rates ? rates.displayedRate : 0, 1)}</span>
               ${statusBadge}
             </div>
           </div>
@@ -949,16 +948,16 @@
 
     if (statusPill) {
       if (emp.status === 'PENDING_ADMIN') {
-        statusPill.className = 'px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200';
-        statusPill.textContent = 'Chờ Admin duyệt';
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 inline-flex items-center gap-1.5';
+        statusPill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Chờ Admin duyệt';
         statusPill.classList.remove('hidden');
       } else if (emp.status === 'APPROVED') {
-        statusPill.className = 'px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200';
-        statusPill.textContent = 'Đã duyệt chính thức';
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1.5';
+        statusPill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã duyệt chính thức';
         statusPill.classList.remove('hidden');
       } else if (emp.status === 'REJECTED') {
-        statusPill.className = 'px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-800 border border-rose-200';
-        statusPill.textContent = 'Bị từ chối';
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-800 border border-rose-200 inline-flex items-center gap-1.5';
+        statusPill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Bị từ chối';
         statusPill.classList.remove('hidden');
       } else {
         statusPill.classList.add('hidden');
@@ -1412,17 +1411,17 @@
       const amount = emp.finalIncentive || emp.incentiveAmount || Math.round((emp.baseIncentive || 20000000) * factor);
 
       return `
-        <tr class="hover:bg-slate-50">
-          <td class="p-3 font-semibold text-slate-700">${emp.id}</td>
-          <td class="p-3 font-medium text-slate-900">${emp.name}</td>
-          <td class="p-3 text-slate-600">${emp.department}</td>
-          <td class="p-3 text-slate-500">${emp.position}</td>
-          <td class="p-3 text-right">${emp.target} triệu ₫</td>
-          <td class="p-3 text-right font-medium">${emp.actual} triệu ₫</td>
-          <td class="p-3 text-right font-bold">${IncentiveEngine.formatPercent(rate, 1)}</td>
-          <td class="p-3 text-right font-bold text-teal-700 masked-amount">${IncentiveEngine.formatVND(amount)}</td>
-          <td class="p-3 text-center">
-            <button onclick="selectRecEmployee('${emp.id}'); switchTab('recommendation');" class="text-teal-600 hover:underline font-semibold text-xs">
+        <tr class="hover:bg-teal-50/20 transition-colors">
+          <td class="p-3.5 font-mono font-semibold text-slate-700">${emp.id}</td>
+          <td class="p-3.5 font-medium text-slate-900">${emp.name}</td>
+          <td class="p-3.5 text-slate-600">${emp.department}</td>
+          <td class="p-3.5 text-slate-500">${emp.position}</td>
+          <td class="p-3.5 text-right font-mono tabular-nums text-slate-700">${emp.target} triệu ₫</td>
+          <td class="p-3.5 text-right font-mono tabular-nums font-medium text-slate-900">${emp.actual} triệu ₫</td>
+          <td class="p-3.5 text-right font-mono tabular-nums font-bold text-slate-900">${IncentiveEngine.formatPercent(rate, 1)}</td>
+          <td class="p-3.5 text-right font-mono tabular-nums font-bold text-teal-800 masked-amount">${IncentiveEngine.formatVND(amount)}</td>
+          <td class="p-3.5 text-center">
+            <button onclick="selectRecEmployee('${emp.id}'); switchTab('recommendation');" class="px-2.5 py-1 rounded-md bg-teal-50 hover:bg-teal-100 text-teal-800 font-semibold text-[11px] transition">
               Đề xuất
             </button>
           </td>
