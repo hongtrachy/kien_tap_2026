@@ -1,0 +1,3 @@
+[
+  { "employee_id": "EMP-002", "manager_id": "MGR-02", "period": "2026-Q3", "scores": { "quality": 4.2, "collaboration": 4.5, "initiative": 3.8, "objectiveDifficulty": 4.8 }, "comment": "Thị trường khu vực khó khăn nhưng nhân viên vẫn duy trì phối hợp và tiến độ công việc tốt.", "status": "submitted" }
+]

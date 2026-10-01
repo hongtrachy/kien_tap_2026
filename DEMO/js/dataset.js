@@ -152,6 +152,7 @@
         objectiveDifficulty: 4.8,
         comment: 'Thị trường Đông Nam Bộ gặp khó khăn khách quan lớn (sức mua co hẹp 10.2%). Nhân sự nỗ lực duy trì 85% chỉ tiêu là rất đáng ghi nhận.',
         managerId: 'MGR-02',
+        normalizedDelta: 0.008,
         evaluatedDate: '05/09/2026'
       },
       auditLog: [
@@ -488,7 +489,9 @@
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = BenchmarkDataset;
-  } else {
-    global.BenchmarkDataset = BenchmarkDataset;
+  }
+  global.BenchmarkDataset = BenchmarkDataset;
+  if (typeof window !== 'undefined') {
+    window.BenchmarkDataset = BenchmarkDataset;
   }
 })(typeof window !== 'undefined' ? window : globalThis);

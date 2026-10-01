@@ -1,0 +1,6 @@
+{
+  "RULE_BASED": { "min": 0.3, "max": 1.0 },
+  "ML_PREDICTION": { "min": 0.0, "max": 0.4 },
+  "MANAGER_EVAL": { "min": 0.0, "max": 0.35 },
+  "KPI_REVENUE": { "min": 0.0, "max": 0.6 }
+}

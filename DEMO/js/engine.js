@@ -439,7 +439,9 @@
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = IncentiveEngine;
-  } else {
-    global.IncentiveEngine = IncentiveEngine;
+  }
+  global.IncentiveEngine = IncentiveEngine;
+  if (typeof window !== 'undefined') {
+    window.IncentiveEngine = IncentiveEngine;
   }
 })(typeof window !== 'undefined' ? window : globalThis);

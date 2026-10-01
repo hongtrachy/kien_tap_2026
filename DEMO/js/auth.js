@@ -118,6 +118,7 @@
 
     // Nếu là quản lý hoặc admin
     if (user.role === 'manager') {
+      if (tabId === 'comp-plans') return false;
       // Quản lý không có quyền xuất chi trả payroll cấp hai
       if (tabId === 'payroll') return false;
       return true;
@@ -166,7 +167,9 @@
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = AppAuth;
-  } else {
-    global.AppAuth = AppAuth;
+  }
+  global.AppAuth = AppAuth;
+  if (typeof window !== 'undefined') {
+    window.AppAuth = AppAuth;
   }
 })(typeof window !== 'undefined' ? window : globalThis);

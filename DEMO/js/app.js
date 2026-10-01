@@ -3,8 +3,11 @@
  * Thiết kế tinh giản, trực quan, giống bản gốc, loại bỏ hoàn toàn chi tiết thừa và AI-slop.
  */
 
-(function () {
+(function (global) {
   'use strict';
+  const AppAuth = global.AppAuth || (typeof window !== 'undefined' ? window.AppAuth : null);
+  const IncentiveEngine = global.IncentiveEngine || (typeof window !== 'undefined' ? window.IncentiveEngine : null);
+  const CompensationPlans = global.CompensationPlans || (typeof window !== 'undefined' ? window.CompensationPlans : null);
 
   // Thông báo Toast đơn giản
   function showToast(message, type = 'success') {
@@ -60,7 +63,10 @@
         description: 'Hợp đồng B2B kéo dài 4–6 tháng cần có trọng số riêng để phản ánh đúng công sức thay vì tính cào bằng với hợp đồng nhỏ.',
         status: 'PENDING_ADMIN', impact: 0, submittedBy: 'Lê Hoàng Nam', submittedDepartment: 'Khách hàng Doanh nghiệp', submittedDate: '18/09/2026'
       }
-    ]
+    ],
+    evaluations: [],
+    claims: [],
+    retentionFunds: []
   };
 
   const WORKFLOW_STORAGE_KEY = 'incentive_workflow_v1';
@@ -124,7 +130,9 @@
   }
 
   function getRecommendationRates(employee, allEmployees) {
-    const recommendation = SmartRecommendationEngine.computeEmployeeRecommendation(employee, allEmployees);
+    const recommendation = SmartRecommendationEngine.computeEmployeeRecommendation(employee, allEmployees, {
+      period: state.selectedPeriod.replace('_', '-')
+    });
     if (!recommendation) return null;
     const hasWorkflowRate = ['PENDING_ADMIN', 'APPROVED', 'REJECTED'].includes(employee.status) && Number.isFinite(employee.finalRate);
     return {
@@ -220,6 +228,17 @@
     if (window.SmartRecommendationEngine) {
       await SmartRecommendationEngine.loadMLPredictions();
     }
+    if (window.CompensationPlans) {
+      await CompensationPlans.loadPlans();
+    }
+    try {
+      const [evaluations, claims, funds] = await Promise.all([
+        fetch('data/performance_evaluations.json').then(r => r.json()),
+        fetch('data/expectation_claims.json').then(r => r.json()),
+        fetch('data/retention_fund.json').then(r => r.json())
+      ]);
+      state.evaluations = evaluations; state.claims = claims; state.retentionFunds = funds;
+    } catch (_) { /* Chạy qua file:// vẫn có thể thao tác với dữ liệu trong phiên. */ }
 
     if (!state.currentUser) {
       showLoginScreen();
@@ -251,20 +270,30 @@
   }
 
   window.fillDemoAccount = function (roleKey) {
-    const account = AppAuth.SAMPLE_ACCOUNTS[roleKey];
+    const auth = window.AppAuth || (typeof AppAuth !== 'undefined' ? AppAuth : null);
+    const account = auth?.SAMPLE_ACCOUNTS ? auth.SAMPLE_ACCOUNTS[roleKey] : null;
     if (!account) return;
     const username = document.getElementById('login-username');
     const password = document.getElementById('login-password');
     if (username) username.value = account.username;
     if (password) password.value = account.demoPassword;
     document.getElementById('login-error')?.classList.add('hidden');
+    // Đăng nhập tự động mượt mà
+    if (typeof window.submitLogin === 'function') {
+      window.submitLogin();
+    }
   };
 
   window.submitLogin = function (event) {
-    event.preventDefault();
+    if (event && event.preventDefault) event.preventDefault();
+    const auth = window.AppAuth || (typeof AppAuth !== 'undefined' ? AppAuth : null);
+    if (!auth) {
+      console.error('AppAuth is not loaded yet');
+      return;
+    }
     const username = document.getElementById('login-username')?.value.trim();
     const password = document.getElementById('login-password')?.value || '';
-    const result = AppAuth.login(username, password);
+    const result = auth.login(username, password);
     if (!result.success) {
       const error = document.getElementById('login-error');
       if (error) { error.textContent = result.message; error.classList.remove('hidden'); }
@@ -323,7 +352,10 @@
     } else if (role === 'manager') {
       items = [
         { id: 'overview', label: 'Tổng quan', icon: 'fa-house' },
+        { id: 'comp-plans', label: 'Cấu hình cơ chế thưởng', icon: 'fa-sliders' },
         { id: 'recommendation', label: 'Đề xuất mức thưởng', icon: 'fa-calculator' },
+        { id: 'evaluation', label: 'Đánh giá & lịch sử', icon: 'fa-star' },
+        { id: 'schemes', label: 'Cơ chế phòng ban', icon: 'fa-layer-group' },
         { id: 'employees', label: 'Danh sách nhân sự', icon: 'fa-users' },
         { id: 'validation', label: 'Xét duyệt & kiểm tra', icon: 'fa-clipboard-check' }
       ];
@@ -332,6 +364,8 @@
       items = [
         { id: 'overview', label: 'Tổng quan', icon: 'fa-house' },
         { id: 'recommendation', label: 'Đề xuất mức thưởng', icon: 'fa-calculator' },
+        { id: 'evaluation', label: 'Đánh giá & lịch sử', icon: 'fa-star' },
+        { id: 'schemes', label: 'Cơ chế phòng ban', icon: 'fa-layer-group' },
         { id: 'employees', label: 'Danh sách nhân sự', icon: 'fa-users' },
         { id: 'validation', label: 'Xét duyệt & kiểm tra', icon: 'fa-clipboard-check' },
         { id: 'payroll', label: 'Chi trả thưởng', icon: 'fa-file-invoice-dollar' }
@@ -353,7 +387,7 @@
   }
 
   // Chuyển Tab
-  window.switchTab = function (tabId) {
+  function switchTab(tabId) {
     if (!AppAuth.checkRoutePermission(tabId, state.currentUser)) {
       showToast('Bạn không có quyền truy cập chức năng này.', 'warning');
       return;
@@ -374,12 +408,16 @@
     renderSidebarNav();
 
     if (tabId === 'overview') renderOverview();
+    if (tabId === 'comp-plans') renderCompPlans();
     if (tabId === 'recommendation') renderRecommendationView();
     if (tabId === 'slip') renderSlipView();
     if (tabId === 'employees') renderEmployeesTable();
     if (tabId === 'validation') renderValidationQueue();
+    if (tabId === 'evaluation') renderEvaluationView();
+    if (tabId === 'schemes') renderDepartmentSchemesView();
     if (tabId === 'payroll') renderPayrollView();
-  };
+  }
+  window.switchTab = switchTab;
 
   function updatePageHeader(tabId) {
     const titleEl = document.getElementById('page-title');
@@ -387,9 +425,12 @@
     const periodStr = state.selectedPeriod.replace('_', '/');
     const titles = {
       overview: { t: 'Tổng quan', s: `Tiến độ hoàn thành chỉ tiêu và dự phóng quỹ thưởng kỳ ${periodStr}` },
+      'comp-plans': { t: 'Cấu hình cơ chế thưởng theo phòng ban', s: 'Thư viện nguồn tính thưởng, version và phê duyệt tập trung' },
       recommendation: { t: 'Đề xuất mức thưởng thông minh', s: 'Tổng hợp từ quy chế công ty, dữ liệu lịch sử và đánh giá của quản lý' },
+      schemes: { t: 'Cơ chế thưởng theo phòng ban', s: 'Quản lý cấu hình nguồn tính thưởng cho từng phòng ban, kiểm soát trần/sàn chống cảm tính và theo dõi phiên bản chính sách' },
       employees: { t: 'Danh sách nhân sự & chỉ tiêu', s: `Theo dõi tiến độ hoàn thành chỉ tiêu toàn bộ nhân viên kỳ ${periodStr}` },
       validation: { t: 'Xét duyệt đề xuất & kiểm tra dữ liệu', s: 'Phê duyệt đề xuất từ quản lý và rà soát các trường hợp bất thường' },
+      evaluation: { t: 'Đánh giá quản lý & lịch sử hiệu suất', s: 'Chuẩn hóa đánh giá và tra cứu kết quả nhiều kỳ' },
       payroll: { t: 'Chi trả thưởng & xuất bảng lương', s: `Đối soát tổng ngân sách và xuất file CSV kỳ ${periodStr} sang phòng Kế toán` },
       slip: { t: 'Phiếu thưởng cá nhân', s: `Bản giải trình chi tiết cách tính khoản thưởng kỳ ${periodStr}` }
     };
@@ -444,11 +485,75 @@
     renderOverviewChart();
     renderDistributionChart();
     renderOptimizationCards();
+    renderDepartmentComparison();
+  }
+
+  function renderDepartmentComparison() {
+    const panel = document.getElementById('department-comparison-panel');
+    const container = document.getElementById('department-comparison-list');
+    if (!panel || !container) return;
+    panel.classList.remove('hidden');
+    const employees = getActiveEmployees();
+    const groups = [...new Set(employees.map(e => e.department))];
+    const curPeriod = state.selectedPeriod.replace('_', '-');
+
+    // Tính mức thưởng trung bình toàn công ty làm chuẩn đối chuẩn
+    const allRates = employees.map(e => getRecommendationRates(e, employees)?.displayedRate || 0);
+    const companyAvg = allRates.length ? allRates.reduce((a, b) => a + b, 0) / allRates.length : 1.0;
+
+    container.innerHTML = groups.map(department => {
+      const deptEmps = employees.filter(e => e.department === department);
+      const rates = deptEmps.map(e => getRecommendationRates(e, employees)?.displayedRate || 0).sort((a, b) => a - b);
+      const avg = rates.length ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
+      const min = rates[0] || 0, max = rates[rates.length - 1] || 0;
+
+      const plan = window.CompensationPlans ? CompensationPlans.getPlanForPeriod(department, curPeriod) : null;
+      const planLabel = plan
+        ? `v${plan.version} (${plan.sources.map(s => `${(s.weight * 100).toFixed(0)}% ${s.type === 'RULE_BASED' ? 'Quy chế' : s.type === 'ML_PREDICTION' ? 'Học máy' : s.type === 'MANAGER_EVAL' ? 'Quản lý' : 'Doanh thu'}`).join(', ')})`
+        : 'Công thức chuẩn';
+
+      // Kiểm định công bằng liên phòng ban (Cross-Department Equity Check)
+      const diffFromCompany = Math.abs(avg - companyAvg);
+      const isBalanced = diffFromCompany <= 0.12;
+
+      return `
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <strong class="text-slate-900 font-semibold text-xs">${department}</strong>
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white border border-slate-200 text-slate-600">${deptEmps.length} NV</span>
+              </div>
+              <div class="text-[11px] text-teal-800 font-medium mt-0.5">${planLabel}</div>
+            </div>
+            ${isBalanced ? `
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                <i class="fa-solid fa-check"></i> Cân bằng chuẩn
+              </span>
+            ` : `
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1" title="Mức chi trả bình quân lệch so với toàn công ty">
+                <i class="fa-solid fa-triangle-exclamation"></i> Lệch ${(diffFromCompany * 100).toFixed(1)}% so với TB
+              </span>
+            `}
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>Hệ số chi trả TB: <strong class="text-slate-800 font-bold font-mono">${IncentiveEngine.formatPercent(avg, 1)}</strong></span>
+              <span>Dải phân bổ: <strong class="font-mono text-slate-700">${IncentiveEngine.formatPercent(min, 0)} – ${IncentiveEngine.formatPercent(max, 0)}</strong></span>
+            </div>
+            <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div class="h-full bg-teal-600 rounded-full transition-all" style="width:${Math.min(100, avg / 1.5 * 100)}%"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   function renderOverviewChart() {
     const ctx = document.getElementById('overviewTrendsChart');
-    if (!ctx) return;
+    if (!ctx || typeof Chart === 'undefined') return;
 
     if (state.overviewChartInstance) {
       state.overviewChartInstance.destroy();
@@ -558,7 +663,7 @@
 
   function renderDistributionChart() {
     const ctx = document.getElementById('overviewDistributionChart');
-    if (!ctx) return;
+    if (!ctx || typeof Chart === 'undefined') return;
 
     if (state.distributionChartInstance) {
       state.distributionChartInstance.destroy();
@@ -1046,7 +1151,22 @@
         : 'Mức thưởng hệ thống đề xuất:';
     }
 
-    // 3 Thẻ nguồn đóng góp
+    // Các thẻ nguồn đóng góp được sinh theo cấu hình phòng ban của kỳ đang xem.
+    const sourceContainer = document.getElementById('rec-source-breakdown');
+    const breakdownTitle = document.getElementById('rec-breakdown-title');
+    const sourceLabels = { RULE_BASED: 'Theo quy chế công ty', ML_PREDICTION: 'Dự báo dữ liệu lịch sử', MANAGER_EVAL: 'Đánh giá của quản lý', KPI_REVENUE: 'KPI doanh thu' };
+    if (sourceContainer && rec.breakdown && rec.breakdown.length) {
+      if (breakdownTitle) breakdownTitle.textContent = `${rec.breakdown.length} nguồn căn cứ cấu thành mức đề xuất${rec.plan ? ` · Cấu hình v${rec.plan.version}` : ''}`;
+      sourceContainer.className = `grid grid-cols-1 md:grid-cols-${Math.min(rec.breakdown.length, 4)} gap-3`;
+      sourceContainer.innerHTML = rec.breakdown.map(item => `
+        <div class="p-3.5 rounded-lg border border-slate-200/80 bg-white">
+          <div class="text-[11px] text-slate-500 font-semibold">${sourceLabels[item.type] || item.type} (${(item.weight * 100).toFixed(0)}%)</div>
+          <div class="text-lg font-bold font-mono text-slate-900 mt-1 tabular-nums">${IncentiveEngine.formatPercent(item.rate, 1)}</div>
+          <div class="text-xs text-slate-500 mt-0.5">Đóng góp: ${IncentiveEngine.formatPercent(item.contribution, 1)}.</div>
+        </div>`).join('');
+    }
+
+    // Tương thích các ID cũ trong giao diện mẫu.
     const rRuleEl = document.getElementById('rec-card-rule-rate');
     const rRuleDesc = document.getElementById('rec-card-rule-desc');
     if (rRuleEl) rRuleEl.textContent = IncentiveEngine.formatPercent(rec.rRule, 1);
@@ -1067,16 +1187,25 @@
     const fStep1 = document.getElementById('rec-formula-step1-values');
     const fStep1Sub = document.getElementById('rec-formula-step1-sub');
     if (fStep1) {
-      const rRulePct = IncentiveEngine.formatPercent(rec.rRule, 1);
-      const rMLPct = IncentiveEngine.formatPercent(rec.rML, 1);
-      const mgrSignText = rec.deltaManager >= 0 ? `+ ${(rec.deltaManager * 100).toFixed(1)}%` : `- ${Math.abs(rec.deltaManager * 100).toFixed(1)}%`;
-      const rPropPct = IncentiveEngine.formatPercent(rec.rProposed, 1);
-      fStep1.textContent = `= (70% × ${rRulePct}) + (30% × ${rMLPct}) ${mgrSignText} = ${rPropPct}`;
-      if (fStep1Sub) {
-        const pRule = (0.7 * rec.rRule * 100).toFixed(2);
-        const pML = (0.3 * rec.rML * 100).toFixed(2);
-        const pMgr = (rec.deltaManager * 100).toFixed(1);
-        fStep1Sub.textContent = `Trong đó: ${pRule}% từ quy chế + ${pML}% từ dữ liệu lịch sử + ${pMgr}% từ đánh giá của quản lý.`;
+      if (rec.breakdown && rec.breakdown.length) {
+        const partsMath = rec.breakdown.map(item => `(${(item.weight * 100).toFixed(0)}% × ${IncentiveEngine.formatPercent(item.rate, 1)})`);
+        fStep1.textContent = `= ${partsMath.join(' + ')} = ${IncentiveEngine.formatPercent(rec.rProposed, 1)}`;
+        if (fStep1Sub) {
+          const partsSub = rec.breakdown.map(item => `${(item.contribution * 100).toFixed(1)}% từ ${item.label || item.type}`);
+          fStep1Sub.textContent = `Trong đó: ${partsSub.join(' + ')}.`;
+        }
+      } else {
+        const rRulePct = IncentiveEngine.formatPercent(rec.rRule, 1);
+        const rMLPct = IncentiveEngine.formatPercent(rec.rML, 1);
+        const mgrSignText = rec.deltaManager >= 0 ? `+ ${(rec.deltaManager * 100).toFixed(1)}%` : `- ${Math.abs(rec.deltaManager * 100).toFixed(1)}%`;
+        const rPropPct = IncentiveEngine.formatPercent(rec.rProposed, 1);
+        fStep1.textContent = `= (70% × ${rRulePct}) + (30% × ${rMLPct}) ${mgrSignText} = ${rPropPct}`;
+        if (fStep1Sub) {
+          const pRule = (0.7 * rec.rRule * 100).toFixed(2);
+          const pML = (0.3 * rec.rML * 100).toFixed(2);
+          const pMgr = (rec.deltaManager * 100).toFixed(1);
+          fStep1Sub.textContent = `Trong đó: ${pRule}% từ quy chế + ${pML}% từ dữ liệu lịch sử + ${pMgr}% từ đánh giá của quản lý.`;
+        }
       }
     }
 
@@ -1438,13 +1567,102 @@
   // =========================================================================
   // VIEW 5: XÉT DUYỆT ĐỀ XUẤT & KIỂM TRA DỮ LIỆU
   // =========================================================================
+  function renderCompPlans() {
+    const plans = CompensationPlans.getPlans();
+    const list = document.getElementById('comp-plans-list');
+    const pending = document.getElementById('comp-pending-list');
+    const select = document.getElementById('comp-plan-department');
+    const active = plans.filter(p => p.status === 'active');
+    if (select) select.innerHTML = active.map(p => `<option value="${p.department}">${p.department}</option>`).join('');
+    if (list) list.innerHTML = active.map(plan => {
+      const history = plans.filter(p => p.department === plan.department).sort((a,b) => b.version-a.version);
+      return `<div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3"><div class="flex justify-between"><strong>${plan.department}</strong><span class="text-teal-800 font-semibold">v${plan.version} · ${plan.effective_from}</span></div>${plan.sources.map(s => `<div><div class="flex justify-between text-[11px]"><span>${CompensationPlans.sourceRegistry[s.type].label}</span><span>${s.type === 'MANAGER_EVAL' ? `×${s.weight}` : `${(s.weight*100).toFixed(0)}%`}</span></div><div class="h-2 mt-1 bg-slate-200 rounded overflow-hidden"><div class="h-full bg-teal-600" style="width:${Math.min(100,s.weight*100)}%"></div></div></div>`).join('')}<div class="pt-2 border-t text-[11px] text-slate-500">Lịch sử: ${history.map(h => `v${h.version} (${h.status})`).join(' → ')}</div></div>`;
+    }).join('');
+    if (pending) pending.innerHTML = plans.filter(p => ['DRAFT','PENDING_APPROVAL'].includes(p.status)).map(p => `<div class="p-3 border rounded flex justify-between"><span>${p.department} · v${p.version} · ${p.status}</span>${p.status === 'DRAFT' ? `<button onclick="submitCompPlan('${p.department}',${p.version})" class="px-2 py-1 rounded bg-slate-700 text-white font-semibold">Gửi duyệt</button>` : `<button onclick="approveCompPlan('${p.department}',${p.version})" class="px-2 py-1 rounded bg-teal-700 text-white font-semibold">Duyệt</button>`}</div>`).join('') || '<span class="text-slate-500">Không có cấu hình chờ duyệt.</span>';
+  }
+  window.createCompPlan = function(event) { event.preventDefault(); const plan = { department: document.getElementById('comp-plan-department').value, effective_from: document.getElementById('comp-plan-effective').value, sources: [{ type:'RULE_BASED', weight:+document.getElementById('comp-rule').value },{ type:'ML_PREDICTION', weight:+document.getElementById('comp-ml').value },{ type:'MANAGER_EVAL', weight:+document.getElementById('comp-manager').value }] }; const r = CompensationPlans.addPlanVersion(plan, state.currentUser.role); const error = document.getElementById('comp-plan-error'); if (!r.valid) { error.textContent=r.errors.join(' '); return; } error.textContent='Đã lưu nháp v'+r.plan.version+'. Hãy gửi duyệt ở bước tiếp theo.'; renderCompPlans(); };
+  window.submitCompPlan = function(department, version) { const r = CompensationPlans.submitPlan(department,version,state.currentUser.role); if (!r.valid) return showToast(r.errors[0],'warning'); renderCompPlans(); showToast('Đã gửi cấu hình chờ phê duyệt.'); };
+  window.approveCompPlan = function(department, version) { const r = CompensationPlans.approvePlan(department,version,state.currentUser.role); if (!r.valid) return showToast(r.errors[0],'warning'); renderCompPlans(); showToast('Đã duyệt và kích hoạt cấu hình mới.'); };
+
   function renderValidationQueue() {
+    renderCalibrationRisks();
+    renderExpectationClaims();
     // 1. Khối đề xuất thưởng chờ duyệt
     renderApprovalQueue();
 
     // 2. Khối 5 trường hợp lỗi dữ liệu bất thường
     renderDataAnomalyQueue();
   }
+
+  function renderCalibrationRisks() {
+    const container = document.getElementById('calibration-risk-list');
+    if (!container || !window.ManagerEvaluation) return;
+    const departments = [...new Set(state.employees.map(e => e.department))];
+    container.innerHTML = departments.map(department => {
+      const risk = ManagerEvaluation.flagCalibrationRisk(department, state.selectedPeriod.replace('_', '-'), state.evaluations);
+      return `<div class="p-3 rounded-lg border ${risk.flag ? 'border-amber-200 bg-amber-50' : 'border-emerald-100 bg-emerald-50/50'} text-xs">
+        <strong>${department}</strong> · điều chỉnh TB ${(risk.avgDelta * 100).toFixed(1)}%<br><span class="${risk.flag ? 'text-amber-800' : 'text-emerald-700'}">${risk.flag ? risk.reason : 'Không có dấu hiệu bất thường.'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderExpectationClaims() {
+    const container = document.getElementById('expectation-claims-list');
+    if (!container) return;
+    container.innerHTML = state.claims.length ? state.claims.map((claim, index) => {
+      const emp = state.employees.find(e => e.id === claim.employee_id);
+      return `<div class="p-3 rounded-lg border border-slate-200 text-xs"><strong>${emp ? emp.name : claim.employee_id}</strong> · kỳ vọng ${IncentiveEngine.formatVND(claim.employee_expected_amount)}<br>
+        <span class="text-slate-500">Trạng thái: ${claim.status}</span>
+        ${state.currentUser.role === 'admin' && claim.status === 'pending' ? `<button onclick="resolveClaim(${index})" class="mt-2 px-2.5 py-1 bg-teal-700 text-white rounded text-[11px] font-semibold">Xử lý 3 bước</button>` : ''}
+        ${claim.resolution ? `<div class="mt-2 text-emerald-700">Kết quả: ${IncentiveEngine.formatVND(claim.resolution.final_amount)}</div>` : ''}
+      </div>`;
+    }).join('') : '<p class="text-xs text-slate-500">Chưa có yêu cầu nào.</p>';
+  }
+
+  function renderEvaluationView() {
+    const visible = AppAuth.filterEmployeesByPermission(getActiveEmployees(), state.currentUser);
+    const options = visible.map(e => `<option value="${e.id}">${e.name} (${e.code})</option>`).join('');
+    const formSelect = document.getElementById('eval-employee-id');
+    const historySelect = document.getElementById('history-employee-id');
+    if (formSelect) { formSelect.innerHTML = options; formSelect.value = state.selectedRecEmpId && visible.some(e => e.id === state.selectedRecEmpId) ? state.selectedRecEmpId : visible[0]?.id; }
+    if (historySelect) { historySelect.innerHTML = options; historySelect.value = formSelect?.value || visible[0]?.id; renderEmployeeHistory(historySelect.value); }
+  }
+
+  window.renderEmployeeHistory = function (employeeId) {
+    const emp = state.employees.find(e => e.id === employeeId); if (!emp || !window.ManagerEvaluation) return;
+    const summary = ManagerEvaluation.buildHistorySummary(emp);
+    const info = document.getElementById('employee-history-summary');
+    const list = document.getElementById('employee-history-list');
+    if (info) info.innerHTML = `Bình quân: <strong>${IncentiveEngine.formatPercent(summary.hist_avg_rate, 1)}</strong> · Xu hướng: <strong>${(summary.hist_rate_trend * 100).toFixed(1)} điểm/kỳ</strong> · Dao động: <strong>${IncentiveEngine.formatPercent(summary.hist_volatility, 1)}</strong>`;
+    if (list) list.innerHTML = summary.last_5_periods.map(x => `<div class="flex justify-between p-2 rounded bg-slate-50 text-xs"><span>${x.period}</span><strong>${IncentiveEngine.formatPercent(x.rate, 1)}</strong></div>`).join('');
+  };
+
+  window.submitManagerEvaluation = function (event) {
+    event.preventDefault();
+    if (state.currentUser.role !== 'manager') return showToast('Chỉ quản lý trực tiếp được gửi đánh giá.', 'warning');
+    const scores = { quality: +document.getElementById('eval-quality').value, collaboration: +document.getElementById('eval-collaboration').value, initiative: +document.getElementById('eval-initiative').value, objectiveDifficulty: +document.getElementById('eval-difficulty').value };
+    const evaluation = { employee_id: document.getElementById('eval-employee-id').value, manager_id: state.currentUser.id || 'MGR-02', period: state.selectedPeriod.replace('_', '-'), scores, comment: document.getElementById('eval-comment').value.trim(), status: 'submitted', department: state.currentUser.department };
+    const check = ManagerEvaluation.validateEvaluation(evaluation);
+    if (!check.valid) return showToast(check.errors[0], 'warning');
+    state.evaluations.push(evaluation);
+    const emp = state.employees.find(e => e.id === evaluation.employee_id); if (emp) emp.managerEval = { ...scores, comment: evaluation.comment, managerId: evaluation.manager_id };
+    event.target.reset(); showToast('Đã gửi đánh giá; dữ liệu đã sẵn sàng cho bước hiệu chỉnh.'); renderEmployeeHistory(evaluation.employee_id);
+  };
+
+  window.toggleClaimForm = function () { document.getElementById('claim-form')?.classList.toggle('hidden'); };
+  window.submitExpectationClaim = function (event) {
+    event.preventDefault(); const emp = state.employees.find(e => e.id === state.currentUser.employeeId); if (!emp) return;
+    const rates = getRecommendationRates(emp, state.employees);
+    state.claims.push({ employee_id: emp.id, period: state.selectedPeriod.replace('_', '-'), system_proposed_amount: rates.systemAmount, employee_expected_amount: +document.getElementById('claim-expected-amount').value, evidence: [{ type: 'employee_statement', description: document.getElementById('claim-evidence').value.trim(), status: 'pending_review' }], status: 'pending' });
+    event.target.reset(); toggleClaimForm(); showToast('Đã gửi yêu cầu. C&B sẽ rà soát theo quy trình 3 bước.');
+  };
+
+  window.resolveClaim = function (index) {
+    if (state.currentUser.role !== 'admin') return;
+    const claim = state.claims[index]; const emp = state.employees.find(e => e.id === claim.employee_id); const fund = state.retentionFunds.find(f => f.department === emp.department && f.year === 2026) || { total_budget: 0, used: 0 };
+    claim.resolution = ExpectationResolver.resolveExpectationGap(claim, emp, state.employees, fund, emp.managerEval?.managerId); claim.status = 'resolved';
+    renderExpectationClaims(); showToast('Đã xử lý yêu cầu theo 3 bước và lưu bảng phân rã.');
+  };
 
   function renderApprovalQueue() {
     const container = document.getElementById('approval-queue-cards');
@@ -1887,6 +2105,270 @@
     }
   };
 
+  // =========================================================================
+  // VIEW: CƠ CHẾ THƯỞNG THEO PHÒNG BAN (CONTROLLED COMPONENT LIBRARY - HƯỚNG 1)
+  // =========================================================================
+  function renderDepartmentSchemesView() {
+    const container = document.getElementById('department-schemes-cards');
+    const countEl = document.getElementById('schemes-active-count');
+    if (!container || !window.CompensationPlans) return;
+
+    const allPlans = CompensationPlans.getPlans();
+    const depts = ['Kinh doanh Miền Bắc', 'Kinh doanh Miền Nam', 'Khách hàng Doanh nghiệp', 'Vận hành Bán lẻ'];
+    const curPeriod = state.selectedPeriod.replace('_', '-');
+
+    if (countEl) {
+      countEl.textContent = `${depts.length} phòng ban · Kỳ đánh giá ${state.selectedPeriod.replace('_', '/')}`;
+    }
+
+    const sourceColorMap = {
+      RULE_BASED: { bg: 'bg-teal-600', text: 'text-teal-700', label: 'Quy chế công ty' },
+      ML_PREDICTION: { bg: 'bg-indigo-600', text: 'text-indigo-700', label: 'Học máy lịch sử' },
+      MANAGER_EVAL: { bg: 'bg-amber-600', text: 'text-amber-800', label: 'Đánh giá quản lý' },
+      KPI_REVENUE: { bg: 'bg-emerald-600', text: 'text-emerald-700', label: 'KPI Doanh thu' }
+    };
+
+    container.innerHTML = depts.map(dept => {
+      const activePlan = CompensationPlans.getPlanForPeriod(dept, curPeriod);
+      const deptPlans = allPlans.filter(p => p.department === dept).sort((a, b) => (b.version || 0) - (a.version || 0));
+      const pendingPlan = deptPlans.find(p => p.status === 'PENDING_APPROVAL' || p.status === 'pending');
+      const isAdmin = state.currentUser.role === 'admin';
+      const isManagerOfDept = state.currentUser.role === 'manager' && state.currentUser.department === dept;
+
+      const sourcesList = activePlan && activePlan.sources ? activePlan.sources : [];
+
+      return `
+        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <h4 class="font-bold text-sm text-slate-900">${dept}</h4>
+                ${activePlan ? `
+                  <span class="px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check text-[10px]"></i> Đang áp dụng v${activePlan.version}
+                  </span>
+                ` : '<span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-500">Chưa có cấu hình</span>'}
+                ${pendingPlan ? `
+                  <span class="px-2.5 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                    <i class="fa-solid fa-clock text-[10px]"></i> Bản v${pendingPlan.version} chờ C&B duyệt
+                  </span>
+                ` : ''}
+              </div>
+              <p class="text-xs text-slate-500 mt-1">
+                ${activePlan?.change_note || 'Cấu hình tiêu chuẩn phù hợp chức năng nghiệp vụ của phòng ban.'}
+                ${activePlan?.approved_by ? `· Người duyệt: <strong class="text-slate-700">${activePlan.approved_by}</strong> (${activePlan.approved_at || 'Đã kích hoạt'})` : ''}
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              ${(isAdmin || isManagerOfDept) ? `
+                <button onclick="openNewSchemeModal('${dept}')" class="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition">
+                  <i class="fa-solid fa-code-branch text-teal-700"></i> Tạo phiên bản mới (v${(activePlan?.version || 1) + 1})
+                </button>
+              ` : ''}
+              ${(isAdmin && pendingPlan) ? `
+                <button onclick="executeApproveScheme('${dept}', ${pendingPlan.version})" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5 transition">
+                  <i class="fa-solid fa-check"></i> Duyệt áp dụng v${pendingPlan.version}
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Thanh phân bổ tỷ trọng nguồn -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-600">
+              <span class="font-medium">Cấu trúc ${sourcesList.length} nguồn thành phần:</span>
+              <span class="font-mono font-semibold text-slate-800">Tổng 100%</span>
+            </div>
+            <div class="h-3 rounded-full bg-slate-100 overflow-hidden flex shadow-inner">
+              ${sourcesList.map(s => {
+                const conf = sourceColorMap[s.type] || { bg: 'bg-slate-500' };
+                const pct = Math.round(s.weight * 100);
+                return `<div class="${conf.bg} h-full transition-all" style="width: ${pct}%" title="${conf.label || s.type}: ${pct}%"></div>`;
+              }).join('')}
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-${Math.min(sourcesList.length, 4)} gap-2 pt-1 text-xs">
+              ${sourcesList.map(s => {
+                const conf = sourceColorMap[s.type] || { label: s.type, text: 'text-slate-700' };
+                const pct = Math.round(s.weight * 100);
+                return `
+                  <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/60">
+                    <div class="text-[11px] text-slate-500 truncate">${conf.label || s.type}</div>
+                    <div class="font-bold text-sm font-mono ${conf.text} mt-0.5">${pct}%</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Lịch sử các phiên bản (Version Audit Trail) -->
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <div>
+              <span>Lịch sử phiên bản: </span>
+              ${deptPlans.map(p => `
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded ${p.status === 'active' ? 'bg-emerald-50 text-emerald-700 font-bold border border-emerald-200' : p.status === 'PENDING_APPROVAL' ? 'bg-amber-50 text-amber-700 font-semibold border border-amber-200' : 'bg-slate-100 text-slate-500'}">
+                  v${p.version} (${p.status})
+                </span>
+              `).join(' ')}
+            </div>
+            <span>Hiệu lực từ: <strong class="text-slate-700">${activePlan?.effective_from || '2025-Q3'}</strong></span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.openNewSchemeModal = function (defaultDept) {
+    const modal = document.getElementById('modal-new-scheme');
+    if (!modal) return;
+    const deptSelect = document.getElementById('scheme-input-department');
+    if (deptSelect && defaultDept) {
+      deptSelect.value = defaultDept;
+    }
+    handleSchemeDeptChange(deptSelect ? deptSelect.value : 'Kinh doanh Miền Nam');
+    modal.classList.remove('hidden');
+  };
+
+  window.closeNewSchemeModal = function () {
+    const modal = document.getElementById('modal-new-scheme');
+    if (modal) modal.classList.add('hidden');
+  };
+
+  window.handleSchemeDeptChange = function (dept) {
+    if (!window.CompensationPlans) return;
+    const curPeriod = state.selectedPeriod.replace('_', '-');
+    const plan = CompensationPlans.getPlanForPeriod(dept, curPeriod);
+    const sources = plan?.sources || [{ type: 'RULE_BASED', weight: 0.7 }, { type: 'ML_PREDICTION', weight: 0.3 }];
+
+    ['RULE_BASED', 'ML_PREDICTION', 'MANAGER_EVAL', 'KPI_REVENUE'].forEach(type => {
+      const chk = document.getElementById(`chk-src-${type}`);
+      const input = document.getElementById(`weight-src-${type}`);
+      const found = sources.find(s => s.type === type);
+      if (chk) chk.checked = !!found;
+      if (input) {
+        input.value = found ? Math.round(found.weight * 100) : 0;
+        input.disabled = !found;
+      }
+    });
+
+    updateSchemeWeightCalculation();
+  };
+
+  window.updateSchemeWeightCalculation = function () {
+    let total = 0;
+    let selectedCount = 0;
+    const types = ['RULE_BASED', 'ML_PREDICTION', 'MANAGER_EVAL', 'KPI_REVENUE'];
+    const limits = window.CompensationPlans ? CompensationPlans.getLimits() : { RULE_BASED: 0.8, ML_PREDICTION: 0.4, MANAGER_EVAL: 0.35, KPI_REVENUE: 0.6 };
+    const errors = [];
+
+    types.forEach(type => {
+      const chk = document.getElementById(`chk-src-${type}`);
+      const input = document.getElementById(`weight-src-${type}`);
+      if (input) input.disabled = !chk?.checked;
+      if (chk?.checked) {
+        selectedCount++;
+        const val = Number(input?.value || 0);
+        total += val;
+        const limVal = typeof limits[type] === 'object' ? limits[type]?.max : limits[type];
+        if (limVal != null && val > Math.round(limVal * 100)) {
+          errors.push(`Nguồn ${type} vượt trần cho phép (${Math.round(limVal * 100)}%).`);
+        }
+      }
+    });
+
+    if (selectedCount < 2 || selectedCount > 4) {
+      errors.push('Cần chọn từ 2 đến 4 nguồn độc lập.');
+    }
+    if (total !== 100) {
+      errors.push(`Tổng trọng số phải bằng chính xác 100% (hiện là ${total}%).`);
+    }
+
+    const badge = document.getElementById('scheme-total-weight-badge');
+    if (badge) {
+      badge.textContent = `Tổng: ${total}%`;
+      badge.className = `px-2.5 py-0.5 rounded font-mono font-bold text-xs ${total === 100 && errors.length === 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`;
+    }
+
+    const msgEl = document.getElementById('scheme-validation-message');
+    const submitBtn = document.getElementById('btn-submit-scheme');
+    if (msgEl) {
+      if (errors.length) {
+        msgEl.className = 'p-3 rounded-lg text-xs leading-relaxed bg-rose-50 text-rose-700 border border-rose-200 space-y-1';
+        msgEl.innerHTML = errors.map(e => `<div><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>${e}</div>`).join('');
+        msgEl.classList.remove('hidden');
+        if (submitBtn) submitBtn.disabled = true;
+      } else {
+        msgEl.className = 'p-3 rounded-lg text-xs leading-relaxed bg-emerald-50 text-emerald-800 border border-emerald-200';
+        msgEl.innerHTML = '<div><i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i>Cấu hình thỏa mãn toàn bộ các trần/sàn và quy tắc kiểm soát hệ thống.</div>';
+        msgEl.classList.remove('hidden');
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    }
+  };
+
+  window.submitNewSchemeForm = function (event) {
+    event.preventDefault();
+    if (!window.CompensationPlans) return;
+
+    const dept = document.getElementById('scheme-input-department').value;
+    const period = document.getElementById('scheme-input-period').value;
+    const note = document.getElementById('scheme-input-note').value.trim();
+
+    const sources = [];
+    ['RULE_BASED', 'ML_PREDICTION', 'MANAGER_EVAL', 'KPI_REVENUE'].forEach(type => {
+      const chk = document.getElementById(`chk-src-${type}`);
+      const input = document.getElementById(`weight-src-${type}`);
+      if (chk?.checked) {
+        sources.push({
+          type,
+          weight: Math.round(Number(input?.value || 0)) / 100
+        });
+      }
+    });
+
+    const isManager = state.currentUser.role === 'manager';
+    const actor = isManager ? state.currentUser.username || 'manager' : 'admin';
+
+    const newPlanData = {
+      department: dept,
+      effective_from: period,
+      sources,
+      change_note: note || `Cập nhật cấu hình ${sources.map(s => `${(s.weight*100).toFixed(0)}% ${s.type}`).join(', ')}`
+    };
+
+    const addRes = CompensationPlans.addPlanVersion(newPlanData, actor);
+    if (!addRes.valid) {
+      showToast(addRes.errors.join(' '), 'warning');
+      return;
+    }
+
+    if (isManager) {
+      CompensationPlans.submitPlan(dept, addRes.plan.version, 'admin');
+      showToast(`Đã tạo bản thảo v${addRes.plan.version} cho ${dept} và chuyển Hội đồng C&B xét duyệt.`, 'success');
+    } else {
+      CompensationPlans.approvePlan(dept, addRes.plan.version, 'admin');
+      showToast(`Đã thiết lập và phê duyệt áp dụng ngay phiên bản v${addRes.plan.version} cho ${dept}.`, 'success');
+    }
+
+    closeNewSchemeModal();
+    renderDepartmentSchemesView();
+    renderDepartmentComparison();
+  };
+
+  window.executeApproveScheme = function (dept, version) {
+    if (!window.CompensationPlans) return;
+    const res = CompensationPlans.approvePlan(dept, version, state.currentUser.name || 'Admin C&B');
+    if (!res.valid) {
+      showToast(res.errors.join(' '), 'warning');
+      return;
+    }
+    showToast(`Đã phê duyệt và kích hoạt áp dụng phiên bản v${version} cho ${dept}!`, 'success');
+    renderDepartmentSchemesView();
+    renderDepartmentComparison();
+    if (state.activeTab === 'recommendation') {
+      renderRecommendationView();
+    }
+  };
+
   function setupHashRouting() {
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
@@ -1899,4 +2381,4 @@
   }
 
   window.AppState = state;
-})();
+})(typeof window !== 'undefined' ? window : globalThis);

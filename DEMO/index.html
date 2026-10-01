@@ -92,19 +92,48 @@
                     </p>
                 </div>
 
+                <!-- Inline helper đảm bảo bấm tài khoản mẫu hoạt động tức thì ngay khi mở trang -->
+                <script>
+                    window.fillDemoAccount = function(roleKey) {
+                        var creds = {
+                            admin: { u: 'admin', p: '123456' },
+                            manager: { u: 'manager', p: '123456' },
+                            employee: { u: 'employee', p: '123456' }
+                        };
+                        var acc = creds[roleKey];
+                        if (!acc) return;
+                        var u = document.getElementById('login-username');
+                        var p = document.getElementById('login-password');
+                        if (u) u.value = acc.u;
+                        if (p) p.value = acc.p;
+                        var err = document.getElementById('login-error');
+                        if (err) err.classList.add('hidden');
+
+                        if (typeof window.submitLogin === 'function') {
+                            window.submitLogin();
+                        } else {
+                            setTimeout(function() {
+                                if (typeof window.submitLogin === 'function') {
+                                    window.submitLogin();
+                                }
+                            }, 250);
+                        }
+                    };
+                </script>
+
                 <div class="grid gap-2.5" aria-label="Tài khoản mẫu">
-                    <button onclick="fillDemoAccount('admin')" class="login-role-card group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5 text-left hover:border-teal-600 hover:shadow-sm transition">
+                    <button type="button" onclick="fillDemoAccount('admin')" class="login-role-card group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5 text-left hover:border-teal-600 hover:shadow-sm transition cursor-pointer">
                         <span class="flex items-center gap-3">
                             <span class="grid h-9 w-9 place-items-center rounded-lg bg-teal-50 text-xs font-bold text-teal-800 border border-teal-100">TR</span>
                             <span>
                                 <span class="block text-xs font-bold text-slate-900">Nguyễn Thu Trang</span>
-                                <span class="block text-[11px] text-slate-500">Quản trị viên (Admin C&B & Tài chính)</span>
+                                <span class="block text-[11px] text-slate-500">Quản trị viên (Admin C&B &amp; Tài chính)</span>
                             </span>
                         </span>
                         <i class="fa-solid fa-arrow-right text-xs text-slate-300 group-hover:text-teal-700 group-hover:translate-x-0.5 transition"></i>
                     </button>
 
-                    <button onclick="fillDemoAccount('manager')" class="login-role-card group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5 text-left hover:border-teal-600 hover:shadow-sm transition">
+                    <button type="button" onclick="fillDemoAccount('manager')" class="login-role-card group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5 text-left hover:border-teal-600 hover:shadow-sm transition cursor-pointer">
                         <span class="flex items-center gap-3">
                             <span class="grid h-9 w-9 place-items-center rounded-lg bg-teal-50 text-xs font-bold text-teal-800 border border-teal-100">ĐU</span>
                             <span>
@@ -115,7 +144,7 @@
                         <i class="fa-solid fa-arrow-right text-xs text-slate-300 group-hover:text-teal-700 group-hover:translate-x-0.5 transition"></i>
                     </button>
 
-                    <button onclick="fillDemoAccount('employee')" class="login-role-card group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5 text-left hover:border-teal-600 hover:shadow-sm transition">
+                    <button type="button" onclick="fillDemoAccount('employee')" class="login-role-card group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5 text-left hover:border-teal-600 hover:shadow-sm transition cursor-pointer">
                         <span class="flex items-center gap-3">
                             <span class="grid h-9 w-9 place-items-center rounded-lg bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200">BI</span>
                             <span>
@@ -408,6 +437,11 @@
 
             </div>
 
+            <div id="department-comparison-panel" class="view-panel bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm hidden">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3"><div><h2 class="font-bold text-sm">So sánh mức thưởng liên phòng ban</h2><p class="text-xs text-slate-500 mt-1">Phân phối hệ số thưởng đã chuẩn hóa, giúp phát hiện phòng ban lệch bất thường.</p></div></div>
+                <div id="department-comparison-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            </div>
+
             <!-- ============================================================= -->
             <!-- VIEW 2: ĐỀ XUẤT MỨC THƯỞNG THÔNG MINH                         -->
             <!-- ============================================================= -->
@@ -476,8 +510,8 @@
 
                         <!-- 3. Ba nguồn đóng góp (Quy chế, Lịch sử, Quản lý) -->
                         <div>
-                            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">3 nguồn căn cứ cấu thành mức đề xuất</div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5" id="rec-breakdown-title">Nguồn căn cứ cấu thành mức đề xuất</div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="rec-source-breakdown">
                                 <div class="p-3.5 rounded-lg border border-slate-200/80 bg-white">
                                     <div class="text-[11px] text-slate-500 font-semibold">Theo quy chế công ty (70%)</div>
                                     <div class="text-lg font-bold font-mono text-slate-900 mt-1 tabular-nums" id="rec-card-rule-rate">81,5%</div>
@@ -666,9 +700,127 @@
                         <!-- Khiếu nại -->
                         <div class="border-t border-slate-100 pt-4 flex items-center justify-between">
                             <div class="text-xs text-slate-500">Cần giải trình thêm? Thời hạn gửi trong vòng 15 ngày làm việc.</div>
-                            <button onclick="openDisputeModal()" class="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 transition shadow-2xs">
+                            <button onclick="toggleClaimForm()" class="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 transition shadow-2xs">
                                 Gửi yêu cầu giải trình
                             </button>
+                        </div>
+                        <form id="claim-form" class="hidden border border-amber-200 bg-amber-50/50 rounded-xl p-4 space-y-3" onsubmit="submitExpectationClaim(event)">
+                            <div class="text-xs font-bold text-amber-900">Yêu cầu xem xét chênh lệch kỳ vọng</div>
+                            <input id="claim-expected-amount" type="number" min="0" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs" placeholder="Số tiền thưởng kỳ vọng (VNĐ)">
+                            <textarea id="claim-evidence" required minlength="10" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs" rows="2" placeholder="Bằng chứng hoặc gói việc cần rà soát"></textarea>
+                            <button class="px-3 py-2 rounded-lg bg-teal-700 text-white text-xs font-semibold">Gửi yêu cầu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ĐÁNH GIÁ QUẢN LÝ & LỊCH SỬ -->
+            <div id="view-evaluation" class="view-panel space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <form class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4" onsubmit="submitManagerEvaluation(event)">
+                        <div><h2 class="font-bold text-base">Nhập đánh giá nhân viên</h2><p class="text-xs text-slate-500 mt-1">Điểm 1–5. Điểm ≤2 hoặc ≥4,5 cần giải trình từ 20 ký tự.</p></div>
+                        <select id="eval-employee-id" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs"></select>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input id="eval-quality" type="number" min="1" max="5" step="0.5" required class="rounded-lg border border-slate-300 px-3 py-2 text-xs" placeholder="Chất lượng">
+                            <input id="eval-collaboration" type="number" min="1" max="5" step="0.5" required class="rounded-lg border border-slate-300 px-3 py-2 text-xs" placeholder="Hợp tác">
+                            <input id="eval-initiative" type="number" min="1" max="5" step="0.5" required class="rounded-lg border border-slate-300 px-3 py-2 text-xs" placeholder="Chủ động">
+                            <input id="eval-difficulty" type="number" min="1" max="5" step="0.5" required class="rounded-lg border border-slate-300 px-3 py-2 text-xs" placeholder="Khó khăn khách quan">
+                        </div>
+                        <textarea id="eval-comment" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs" placeholder="Nhận xét của quản lý"></textarea>
+                        <button class="px-4 py-2 bg-teal-700 text-white rounded-lg text-xs font-semibold">Gửi đánh giá</button>
+                    </form>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div><h2 class="font-bold text-base">Lịch sử hiệu suất</h2><p class="text-xs text-slate-500 mt-1">Tổng hợp sẵn để tra cứu và phục vụ mô hình dự báo.</p></div>
+                        <select id="history-employee-id" onchange="renderEmployeeHistory(this.value)" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs"></select>
+                        <div id="employee-history-summary" class="text-xs text-slate-700"></div>
+                        <div id="employee-history-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- VIEW: CƠ CHẾ THƯỞNG THEO PHÒNG BAN (CONTROLLED COMPONENT LIBRARY) -->
+            <!-- ============================================================= -->
+            <div id="view-schemes" class="view-panel space-y-6 hidden">
+                <!-- Header & Action -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-bold text-base text-slate-900">Cơ chế thưởng theo phòng ban (Controlled Component Library)</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">Policy-as-Code</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Linh hoạt lựa chọn nguồn tính thưởng theo đặc thù từng bộ phận nhưng kiểm soát tập trung bằng trần/sàn cứng, lưu vết phiên bản bất biến.</p>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <button onclick="openNewSchemeModal()" class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Thiết lập phiên bản cơ chế mới
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <!-- Cột trái (8 cols): Danh sách cấu hình theo phòng ban -->
+                    <div class="lg:col-span-8 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-sm text-slate-900">Cấu hình chính sách các phòng ban</h3>
+                            <span class="text-xs text-slate-500" id="schemes-active-count">4 phòng ban · Đang áp dụng</span>
+                        </div>
+                        <div id="department-schemes-cards" class="space-y-3.5">
+                            <!-- Render qua JS -->
+                        </div>
+                    </div>
+
+                    <!-- Cột phải (4 cols): Thư viện thành phần & Bộ quy tắc kiểm soát tập trung -->
+                    <div class="lg:col-span-4 space-y-4">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+                            <div class="border-b border-slate-100 pb-3">
+                                <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-book-bookmark text-teal-700"></i> Thư viện thành phần chuẩn
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Danh mục các nguồn được công nhận kèm trần quy định</p>
+                            </div>
+
+                            <div class="space-y-2.5 text-xs">
+                                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/70">
+                                    <div class="flex items-center justify-between font-semibold text-slate-800">
+                                        <span>1. Quy chế công ty (RULE_BASED)</span>
+                                        <span class="text-teal-700 font-mono">Trần ≤ 80%</span>
+                                    </div>
+                                    <p class="text-slate-500 text-[11px] mt-1">Đo lường tiến độ chỉ tiêu có trọng số quy mô &amp; độ phức tạp gói việc.</p>
+                                </div>
+
+                                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/70">
+                                    <div class="flex items-center justify-between font-semibold text-slate-800">
+                                        <span>2. Học máy lịch sử (ML_PREDICTION)</span>
+                                        <span class="text-teal-700 font-mono">Trần ≤ 40%</span>
+                                    </div>
+                                    <p class="text-slate-500 text-[11px] mt-1">Dự báo dựa trên 4 kỳ lịch sử để chống hội chứng phong độ ngắn hạn.</p>
+                                </div>
+
+                                <div class="p-3 rounded-lg bg-amber-50/60 border border-amber-200">
+                                    <div class="flex items-center justify-between font-semibold text-amber-900">
+                                        <span>3. Đánh giá quản lý (MANAGER_EVAL)</span>
+                                        <span class="text-amber-800 font-mono font-bold">Trần ≤ 35%</span>
+                                    </div>
+                                    <p class="text-amber-800/80 text-[11px] mt-1">Đã chuẩn hóa Z-score. Bắt buộc trần ≤ 35% để ngăn chặn cảm tính &amp; thiên vị.</p>
+                                </div>
+
+                                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/70">
+                                    <div class="flex items-center justify-between font-semibold text-slate-800">
+                                        <span>4. Doanh thu độc lập (KPI_REVENUE)</span>
+                                        <span class="text-teal-700 font-mono">Trần ≤ 60%</span>
+                                    </div>
+                                    <p class="text-slate-500 text-[11px] mt-1">Doanh số thực đạt chia chỉ tiêu, dành riêng cho các khối kinh doanh trực tiếp.</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 space-y-2 text-[11px] text-slate-600">
+                                <div class="font-bold text-slate-700 text-xs">4 Ràng buộc kiểm soát (Guardrails):</div>
+                                <div class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> <span>Tổng trọng số các nguồn bắt buộc bằng chính xác 100%.</span></div>
+                                <div class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> <span>Mỗi cấu hình phải chọn từ 2 đến 4 nguồn độc lập.</span></div>
+                                <div class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> <span>Không ghi đè cấu hình cũ: Mọi thay đổi sinh phiên bản mới (v+1).</span></div>
+                                <div class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> <span>Phải được Hội đồng C&B phê duyệt trước khi kích hoạt.</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -713,6 +865,23 @@
             <!-- ============================================================= -->
             <!-- VIEW 5: XÉT DUYỆT ĐỀ XUẤT & KIỂM TRA DỮ LIỆU                  -->
             <!-- ============================================================= -->
+            <div id="view-comp-plans" class="view-panel space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <div class="flex justify-between items-start border-b border-slate-100 pb-4 mb-4"><div><h2 class="font-bold text-base">Cấu hình đang áp dụng theo phòng ban</h2><p class="text-xs text-slate-500 mt-1">Mỗi cấu hình được lưu version, chỉ thay đổi sau khi được phê duyệt.</p></div><span class="text-xs px-2 py-1 rounded bg-teal-50 text-teal-800 font-semibold">Admin C&B</span></div>
+                    <div id="comp-plans-list" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <h2 class="font-bold text-base">Tạo version cấu hình mới</h2><p class="text-xs text-slate-500 mt-1 mb-4">Tạo nháp, kiểm tra tỷ trọng, sau đó gửi duyệt bằng thao tác riêng.</p>
+                    <form onsubmit="createCompPlan(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <select id="comp-plan-department" class="border border-slate-300 rounded-lg px-3 py-2 text-xs"></select>
+                      <input id="comp-plan-effective" value="2026-Q4" class="border border-slate-300 rounded-lg px-3 py-2 text-xs" placeholder="Hiệu lực, VD 2026-Q4">
+                      <div class="md:col-span-2 grid grid-cols-3 gap-2 text-xs"><label>Quy chế <input id="comp-rule" type="number" min="0" max="1" step="0.05" value="0.6" class="mt-1 w-full border rounded px-2 py-1"></label><label>ML <input id="comp-ml" type="number" min="0" max="1" step="0.05" value="0.4" class="mt-1 w-full border rounded px-2 py-1"></label><label>Đánh giá QL <input id="comp-manager" type="number" min="0" max="1" step="0.05" value="1" class="mt-1 w-full border rounded px-2 py-1"></label></div>
+                      <div id="comp-plan-error" class="md:col-span-2 text-xs text-rose-700"></div><button class="w-max px-4 py-2 bg-teal-700 text-white rounded-lg text-xs font-semibold">Lưu nháp</button>
+                    </form>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm"><h2 class="font-bold text-base mb-3">Cấu hình chờ phê duyệt</h2><div id="comp-pending-list" class="space-y-2 text-xs"></div></div>
+            </div>
+
             <div id="view-validation" class="view-panel space-y-6 hidden">
                 <!-- Khối 1: Đề xuất thưởng chờ Admin phê duyệt -->
                 <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4" id="approval-queue-panel">
@@ -728,6 +897,19 @@
 
                     <div class="space-y-3" id="approval-queue-cards">
                         <!-- Render động qua JS -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+                        <h2 class="font-bold text-sm">Cảnh báo hiệu chỉnh điểm</h2>
+                        <p class="text-xs text-slate-500">Các phòng có điểm quản lý cao bất thường sẽ chờ HR xem xét trước khi khóa kỳ.</p>
+                        <div id="calibration-risk-list" class="space-y-2"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+                        <h2 class="font-bold text-sm">Yêu cầu chênh lệch kỳ vọng</h2>
+                        <p class="text-xs text-slate-500">Xử lý minh bạch theo bằng chứng, công bằng đồng cấp và quỹ giữ chân.</p>
+                        <div id="expectation-claims-list" class="space-y-2"></div>
                     </div>
                 </div>
 
@@ -931,11 +1113,134 @@
         </div>
     </div>
 
+    <!-- Modal Thiết lập phiên bản cơ chế mới -->
+    <div id="modal-new-scheme" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">Thiết lập phiên bản cơ chế thưởng mới</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Chọn nguồn từ Thư viện thành phần và gán trọng số (Kiểm tra trần/sàn tự động)</p>
+                </div>
+                <button onclick="closeNewSchemeModal()" class="text-slate-400 hover:text-slate-600 transition" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form onsubmit="submitNewSchemeForm(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="font-semibold text-slate-700 block mb-1">Phòng ban áp dụng</label>
+                        <select id="scheme-input-department" onchange="handleSchemeDeptChange(this.value)" class="w-full border border-slate-300 rounded-lg p-2 bg-slate-50 text-xs">
+                            <option value="Kinh doanh Miền Bắc">Kinh doanh Miền Bắc</option>
+                            <option value="Kinh doanh Miền Nam">Kinh doanh Miền Nam</option>
+                            <option value="Khách hàng Doanh nghiệp">Khách hàng Doanh nghiệp</option>
+                            <option value="Vận hành Bán lẻ">Vận hành Bán lẻ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-slate-700 block mb-1">Kỳ áp dụng hiệu lực</label>
+                        <select id="scheme-input-period" class="w-full border border-slate-300 rounded-lg p-2 bg-slate-50 text-xs">
+                            <option value="2026-Q3">Quý 3/2026 (Kỳ hiện tại)</option>
+                            <option value="2026-Q4">Quý 4/2026 (Kỳ tới)</option>
+                            <option value="2027-Q1">Quý 1/2027</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-slate-700">Lựa chọn nguồn &amp; Trọng số (2 - 4 nguồn):</label>
+                        <span id="scheme-total-weight-badge" class="px-2 py-0.5 rounded font-mono font-bold text-xs bg-slate-100 text-slate-700">Tổng: 0%</span>
+                    </div>
+
+                    <div class="space-y-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <!-- Nguồn 1: RULE_BASED -->
+                        <div class="flex items-center justify-between gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="chk-src-RULE_BASED" onchange="updateSchemeWeightCalculation()" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
+                                <div>
+                                    <span class="font-semibold text-slate-800 block text-xs">Quy chế công ty</span>
+                                    <span class="text-[10px] text-slate-400">Trần tối đa 80%</span>
+                                </div>
+                            </label>
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" id="weight-src-RULE_BASED" min="0" max="80" step="5" value="50" oninput="updateSchemeWeightCalculation()" class="w-16 border rounded p-1 text-center font-bold text-teal-800 text-xs">
+                                <span class="text-slate-500 font-bold">%</span>
+                            </div>
+                        </div>
+
+                        <!-- Nguồn 2: ML_PREDICTION -->
+                        <div class="flex items-center justify-between gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="chk-src-ML_PREDICTION" onchange="updateSchemeWeightCalculation()" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
+                                <div>
+                                    <span class="font-semibold text-slate-800 block text-xs">Học máy lịch sử</span>
+                                    <span class="text-[10px] text-slate-400">Trần tối đa 40%</span>
+                                </div>
+                            </label>
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" id="weight-src-ML_PREDICTION" min="0" max="40" step="5" value="20" oninput="updateSchemeWeightCalculation()" class="w-16 border rounded p-1 text-center font-bold text-teal-800 text-xs">
+                                <span class="text-slate-500 font-bold">%</span>
+                            </div>
+                        </div>
+
+                        <!-- Nguồn 3: MANAGER_EVAL -->
+                        <div class="flex items-center justify-between gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="chk-src-MANAGER_EVAL" onchange="updateSchemeWeightCalculation()" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
+                                <div>
+                                    <span class="font-semibold text-slate-800 block text-xs">Đánh giá quản lý (Chuẩn hóa)</span>
+                                    <span class="text-[10px] text-amber-700 font-semibold">Trần tối đa 35%</span>
+                                </div>
+                            </label>
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" id="weight-src-MANAGER_EVAL" min="0" max="35" step="5" value="0" oninput="updateSchemeWeightCalculation()" class="w-16 border rounded p-1 text-center font-bold text-amber-800 text-xs">
+                                <span class="text-slate-500 font-bold">%</span>
+                            </div>
+                        </div>
+
+                        <!-- Nguồn 4: KPI_REVENUE -->
+                        <div class="flex items-center justify-between gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="chk-src-KPI_REVENUE" onchange="updateSchemeWeightCalculation()" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
+                                <div>
+                                    <span class="font-semibold text-slate-800 block text-xs">KPI Doanh thu độc lập</span>
+                                    <span class="text-[10px] text-slate-400">Trần tối đa 60%</span>
+                                </div>
+                            </label>
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" id="weight-src-KPI_REVENUE" min="0" max="60" step="5" value="30" oninput="updateSchemeWeightCalculation()" class="w-16 border rounded p-1 text-center font-bold text-teal-800 text-xs">
+                                <span class="text-slate-500 font-bold">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Căn cứ & lý do đổi cơ chế -->
+                <div>
+                    <label class="font-semibold text-slate-700 block mb-1">Căn cứ điều chỉnh &amp; Ghi chú phiên bản</label>
+                    <textarea id="scheme-input-note" rows="2" class="w-full border border-slate-300 rounded-lg p-2 text-xs" placeholder="Nêu lý do thay đổi tỷ trọng các nguồn cho phòng ban..."></textarea>
+                </div>
+
+                <!-- Thông báo lỗi / trạng thái kiểm tra trần sàn -->
+                <div id="scheme-validation-message" class="hidden p-3 rounded-lg text-xs leading-relaxed"></div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeNewSchemeModal()" class="px-3.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium hover:bg-slate-50 transition">Hủy</button>
+                    <button type="submit" id="btn-submit-scheme" class="px-4 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-semibold shadow-sm transition">
+                        Lưu phiên bản mới
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/engine.js"></script>
     <script src="js/dataset.js"></script>
     <script src="js/daily-data.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/manager-evaluation.js"></script>
+    <script src="js/compensation.js"></script>
+    <script src="js/expectation-resolver.js"></script>
     <script src="js/recommendation.js"></script>
     <script src="js/app.js"></script>
 </body>

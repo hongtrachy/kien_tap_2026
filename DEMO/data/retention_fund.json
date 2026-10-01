@@ -1,0 +1,4 @@
+[
+  { "department": "Kinh doanh Miền Nam", "year": 2026, "total_budget": 120000000, "used": 0, "allocations": [] },
+  { "department": "Khách hàng Doanh nghiệp", "year": 2026, "total_budget": 200000000, "used": 45000000, "allocations": [{ "employee_id": "EMP-016", "amount": 1000000, "manager_id": "MGR-03", "justification": "Nguy cơ nghỉ việc cao và nhân sự có đề nghị giữ chân đã được hội đồng xem xét.", "approved_by": "admin", "approved_at": "2026-09-20" }] }
+]

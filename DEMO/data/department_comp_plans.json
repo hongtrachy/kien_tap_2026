@@ -1,0 +1,47 @@
+[
+  {
+    "department": "Kinh doanh Miền Bắc",
+    "version": 1,
+    "effective_from": "2025-Q3",
+    "status": "active",
+    "sources": [{ "type": "RULE_BASED", "weight": 0.7 }, { "type": "ML_PREDICTION", "weight": 0.3 }],
+    "approved_by": "admin",
+    "approved_at": "2026-06-01"
+  },
+  {
+    "department": "Kinh doanh Miền Nam",
+    "version": 1,
+    "effective_from": "2025-Q3",
+    "status": "archived",
+    "sources": [{ "type": "RULE_BASED", "weight": 0.7 }, { "type": "ML_PREDICTION", "weight": 0.3 }],
+    "approved_by": "admin",
+    "approved_at": "2026-06-01"
+  },
+  {
+    "department": "Kinh doanh Miền Nam",
+    "version": 2,
+    "effective_from": "2026-Q3",
+    "status": "active",
+    "sources": [{ "type": "RULE_BASED", "weight": 0.5 }, { "type": "ML_PREDICTION", "weight": 0.2 }, { "type": "KPI_REVENUE", "weight": 0.3 }],
+    "approved_by": "admin",
+    "approved_at": "2026-09-01"
+  },
+  {
+    "department": "Khách hàng Doanh nghiệp",
+    "version": 1,
+    "effective_from": "2025-Q3",
+    "status": "active",
+    "sources": [{ "type": "RULE_BASED", "weight": 0.55 }, { "type": "ML_PREDICTION", "weight": 0.2 }, { "type": "MANAGER_EVAL", "weight": 0.25 }],
+    "approved_by": "admin",
+    "approved_at": "2026-06-01"
+  },
+  {
+    "department": "Vận hành Bán lẻ",
+    "version": 1,
+    "effective_from": "2025-Q3",
+    "status": "active",
+    "sources": [{ "type": "RULE_BASED", "weight": 0.65 }, { "type": "MANAGER_EVAL", "weight": 0.35 }],
+    "approved_by": "admin",
+    "approved_at": "2026-06-01"
+  }
+]

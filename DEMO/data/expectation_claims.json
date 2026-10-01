@@ -1,0 +1,3 @@
+[
+  { "employee_id": "EMP-002", "period": "2026-Q3", "system_proposed_amount": 16560000, "employee_expected_amount": 18000000, "evidence": [{ "type": "missing_package", "description": "Đề nghị rà soát gói việc phát sinh trong kỳ.", "status": "pending_review" }], "status": "pending" }
+]

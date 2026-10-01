@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import Engine from '../DEMO/js/engine.js';
+global.IncentiveEngine = Engine;
+import Plans from '../DEMO/js/compensation.js';
+import Dataset from '../DEMO/js/dataset.js';
+
+console.log('=== KIỂM THỬ CẤU HÌNH THƯỞNG THEO PHÒNG BAN ===\n');
+const plans = JSON.parse(await (await import('node:fs/promises')).readFile('DEMO/data/department_comp_plans.json', 'utf8'));
+const limits = JSON.parse(await (await import('node:fs/promises')).readFile('DEMO/data/source_limits.json', 'utf8'));
+Plans.setPlans(plans); Plans.setLimits(limits);
+const binh = Dataset.generateBenchmarkDataset().find(e => e.id === 'EMP-002');
+const oldPlan = Plans.getPlanForPeriod('Kinh doanh Miền Nam', '2026-Q2');
+const newPlan = Plans.getPlanForPeriod('Kinh doanh Miền Nam', '2026-Q3');
+assert.equal(oldPlan.version, 1, 'Kỳ cũ dùng đúng phiên bản cũ');
+assert.equal(newPlan.version, 2, 'Kỳ mới dùng đúng phiên bản mới');
+const oldRate = Plans.calculateRate(binh, '2026-Q2', oldPlan, { rML: .83 });
+const newRate = Plans.calculateRate(binh, '2026-Q3', newPlan, { rML: .83 });
+assert.notEqual(oldRate.rate, newRate.rate, 'Đổi version thay đổi công thức kỳ tương ứng');
+assert.equal(newRate.breakdown.length, 3, 'Kế hoạch Miền Nam có 3 nguồn');
+const invalid = Plans.validateCompPlan({ department: 'Test', sources: [{ type: 'RULE_BASED', weight: .5 }, { type: 'MANAGER_EVAL', weight: .5 }] });
+assert.equal(invalid.valid, false, 'Từ chối MANAGER_EVAL vượt trần 35%');
+console.log('✔ Version theo kỳ, breakdown và giới hạn nguồn hoạt động đúng.');

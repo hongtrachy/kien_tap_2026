@@ -95,13 +95,26 @@
     const normEval = Engine.normalizeManagerEvaluation(managerEval);
     const deltaManager = normEval.deltaManager;
 
-    // 4. Kết hợp 3 nguồn
-    const recCalc = Engine.calculateSmartRecommendation({
-      rRule,
-      rML,
-      deltaManager,
-      flexBand: customConfig.flexBand || 0.20
-    });
+    // 4. Đọc cấu hình nguồn theo phòng ban/kỳ. Khi chưa nạp cấu hình, giữ cơ chế
+    // cũ để tương thích dữ liệu demo và các quy trình đang chạy.
+    const period = customConfig.period || '2026-Q3';
+    let planResult = null;
+    if (global.CompensationPlans && global.CompensationPlans.getPlans().length) {
+      planResult = global.CompensationPlans.calculateRate(emp, period, null, {
+        mlPredictions: mlPredictionsCache,
+        rML,
+        evaluations: customConfig.evaluations || []
+      });
+    }
+    const recCalc = planResult && !planResult.error
+      ? {
+          rBase: planResult.rate,
+          rProposed: Math.max(0, Math.min(1.5, planResult.rate)),
+          flexMin: 0,
+          flexMax: 1.5,
+          isClampedByFlexBand: false
+        }
+      : Engine.calculateSmartRecommendation({ rRule, rML, deltaManager, flexBand: customConfig.flexBand || 0.20 });
 
     const proposedAmount = Math.round(targetIncentivePersonal * recCalc.rProposed);
 
@@ -154,7 +167,13 @@
       explanationText,
       peerStats,
       promotionReady: emp.promotionReady,
-      promotionRationale: emp.promotionRationale
+      promotionRationale: emp.promotionRationale,
+      plan: planResult && planResult.plan,
+      breakdown: planResult ? planResult.breakdown : [
+        { type: 'RULE_BASED', weight: .7, rate: rRule, contribution: .7 * rRule, explanation: 'Theo quy chế công ty.' },
+        { type: 'ML_PREDICTION', weight: .3, rate: rML, contribution: .3 * rML, explanation: 'Dự báo từ dữ liệu lịch sử.' },
+        { type: 'MANAGER_EVAL', weight: 0, rate: 1 + deltaManager, contribution: deltaManager, explanation: 'Điều chỉnh đánh giá quản lý.' }
+      ]
     };
   }
 
