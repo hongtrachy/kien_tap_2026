@@ -118,7 +118,7 @@
 
     // Nếu là quản lý hoặc admin
     if (user.role === 'manager') {
-      if (tabId === 'comp-plans') return false;
+      if (tabId === 'comp-plans' || tabId === 'schemes') return false;
       // Quản lý không có quyền xuất chi trả payroll cấp hai
       if (tabId === 'payroll') return false;
       return true;

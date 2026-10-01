@@ -352,10 +352,8 @@
     } else if (role === 'manager') {
       items = [
         { id: 'overview', label: 'Tổng quan', icon: 'fa-house' },
-        { id: 'comp-plans', label: 'Cấu hình cơ chế thưởng', icon: 'fa-sliders' },
         { id: 'recommendation', label: 'Đề xuất mức thưởng', icon: 'fa-calculator' },
         { id: 'evaluation', label: 'Đánh giá & lịch sử', icon: 'fa-star' },
-        { id: 'schemes', label: 'Cơ chế phòng ban', icon: 'fa-layer-group' },
         { id: 'employees', label: 'Danh sách nhân sự', icon: 'fa-users' },
         { id: 'validation', label: 'Xét duyệt & kiểm tra', icon: 'fa-clipboard-check' }
       ];
@@ -363,9 +361,9 @@
       // Admin
       items = [
         { id: 'overview', label: 'Tổng quan', icon: 'fa-house' },
+        { id: 'schemes', label: 'Cấu hình cơ chế thưởng theo phòng ban', icon: 'fa-layer-group' },
         { id: 'recommendation', label: 'Đề xuất mức thưởng', icon: 'fa-calculator' },
         { id: 'evaluation', label: 'Đánh giá & lịch sử', icon: 'fa-star' },
-        { id: 'schemes', label: 'Cơ chế phòng ban', icon: 'fa-layer-group' },
         { id: 'employees', label: 'Danh sách nhân sự', icon: 'fa-users' },
         { id: 'validation', label: 'Xét duyệt & kiểm tra', icon: 'fa-clipboard-check' },
         { id: 'payroll', label: 'Chi trả thưởng', icon: 'fa-file-invoice-dollar' }
