@@ -204,23 +204,37 @@
     state.currentUser = AppAuth.getCurrentUser();
     state.employees = BenchmarkDataset.generateBenchmarkDataset();
 
-    // Thiết lập sẵn hồ sơ mẫu để quy trình duyệt hoạt động trực quan ngay:
-    const chi = state.employees.find(e => e.id === 'EMP-003');
-    if (chi) {
-      chi.status = 'PENDING_ADMIN';
-      chi.proposalType = 'MANAGER_ADJUSTED';
-      chi.finalRate = 1.05;
-      chi.finalIncentive = 21000000;
-      chi.adjustReason = 'Dự án trọng điểm hoàn thành trước hạn 1 tuần, quản lý đề xuất cộng 5% khuyến khích.';
-      chi.submittedBy = 'Nguyễn Tiến Hưng (Quản lý Miền Bắc)';
-      chi.submittedDate = '19/09/2026';
-    }
-
+    // 4 nhân vật neo đề án:
     const an = state.employees.find(e => e.id === 'EMP-001');
     if (an) {
       an.status = 'APPROVED';
       an.finalRate = 1.375;
       an.finalIncentive = 27500000;
+      an.incentiveAmount = 27500000;
+    }
+
+    const binh = state.employees.find(e => e.id === 'EMP-002');
+    if (binh) {
+      binh.difficultyFactor = 0.9;
+      binh.finalRate = 0.815;
+      binh.finalIncentive = 16300000;
+      binh.incentiveAmount = 16300000;
+    }
+
+    const chi = state.employees.find(e => e.id === 'EMP-003');
+    if (chi) {
+      chi.status = 'APPROVED';
+      chi.finalRate = 1.00;
+      chi.finalIncentive = 20000000;
+      chi.incentiveAmount = 20000000;
+    }
+
+    const dung = state.employees.find(e => e.id === 'EMP-004');
+    if (dung) {
+      dung.status = 'APPROVED';
+      dung.finalRate = 1.00;
+      dung.finalIncentive = 20000000;
+      dung.incentiveAmount = 20000000;
     }
 
     restoreWorkflowState();
@@ -1250,6 +1264,7 @@
     }
     renderRecommendationView();
   };
+  window.selectRecommendationEmployee = window.selectRecEmployee;
 
   window.handleWhatIfSlider = function (value) {
     const rate = Math.max(0, Math.min(150, Number(value) || 0)) / 100;

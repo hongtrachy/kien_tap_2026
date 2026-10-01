@@ -2,7 +2,59 @@
 (function (global) {
   'use strict';
   const DEFAULT_LIMITS = { RULE_BASED: { min: .3, max: 1 }, ML_PREDICTION: { min: 0, max: .4 }, MANAGER_EVAL: { min: 0, max: .35 }, KPI_REVENUE: { min: 0, max: .6 } };
-  let plans = [], limits = DEFAULT_LIMITS;
+  const DEFAULT_PLANS = [
+    {
+      department: "Kinh doanh Miền Bắc",
+      version: 1,
+      effective_from: "2025-Q3",
+      status: "active",
+      sources: [{ type: "RULE_BASED", weight: 0.7 }, { type: "ML_PREDICTION", weight: 0.3 }],
+      approved_by: "admin",
+      approved_at: "2026-06-01"
+    },
+    {
+      department: "Kinh doanh Miền Nam",
+      version: 1,
+      effective_from: "2025-Q3",
+      status: "archived",
+      sources: [{ type: "RULE_BASED", weight: 0.7 }, { type: "ML_PREDICTION", weight: 0.3 }],
+      approved_by: "admin",
+      approved_at: "2026-06-01"
+    },
+    {
+      department: "Kinh doanh Miền Nam",
+      version: 2,
+      effective_from: "2026-Q3",
+      status: "active",
+      sources: [{ type: "RULE_BASED", weight: 0.5 }, { type: "ML_PREDICTION", weight: 0.2 }, { type: "KPI_REVENUE", weight: 0.3 }],
+      approved_by: "admin",
+      approved_at: "2026-09-01"
+    },
+    {
+      department: "Khách hàng Doanh nghiệp",
+      version: 1,
+      effective_from: "2025-Q3",
+      status: "active",
+      sources: [{ type: "RULE_BASED", weight: 0.55 }, { type: "ML_PREDICTION", weight: 0.2 }, { type: "MANAGER_EVAL", weight: 0.25 }],
+      approved_by: "admin",
+      approved_at: "2026-06-01"
+    },
+    {
+      department: "Vận hành Bán lẻ",
+      version: 1,
+      effective_from: "2025-Q3",
+      status: "active",
+      sources: [{ type: "RULE_BASED", weight: 0.65 }, { type: "MANAGER_EVAL", weight: 0.35 }],
+      approved_by: "admin",
+      approved_at: "2026-06-01"
+    }
+  ];
+  let plans = [...DEFAULT_PLANS], limits = DEFAULT_LIMITS;
+  const normalizeDeptName = dept => {
+    if (!dept) return '';
+    if (dept.includes('Doanh nghiệp') || dept.includes('B2B')) return 'Khách hàng Doanh nghiệp';
+    return dept;
+  };
   const index = p => { const s = String(p || ''); const y = +(s.match(/20\d{2}/) || [])[0]; const q = +(s.match(/Q([1-4])/i) || [])[1]; return y && q ? y * 4 + q : -1; };
   const round = n => Math.round(n * 10000) / 10000;
   const sourceRegistry = {
@@ -34,7 +86,12 @@
     }
     return { valid: !errors.length, errors };
   }
-  function getPlanForPeriod(department, period) { const at = index(period); return plans.filter(p => p.department === department && ['active', 'archived'].includes(p.status) && index(p.effective_from) <= at).sort((a,b) => index(b.effective_from) - index(a.effective_from) || b.version - a.version)[0] || null; }
+  function getPlanForPeriod(department, period) {
+    const d = normalizeDeptName(department);
+    const at = index(period);
+    return plans.filter(p => normalizeDeptName(p.department) === d && ['active', 'archived'].includes(p.status) && index(p.effective_from) <= at)
+      .sort((a,b) => index(b.effective_from) - index(a.effective_from) || (b.version || 0) - (a.version || 0))[0] || null;
+  }
   function calculateRate(employee, period, plan, context = {}) { const active = plan || getPlanForPeriod(employee.department, period); const check = validateCompPlan(active); if (!active || !check.valid) return { rate: 0, breakdown: [], error: check.errors?.join(' ') || 'Chưa có cấu hình.' }; let base = 0, delta = 0; const breakdown = active.sources.map(s => { const r = sourceRegistry[s.type].compute(employee, period, context); const contribution = s.weight * r.rate; if (r.isDelta) delta += contribution; else base += contribution; return { type:s.type, label:sourceRegistry[s.type].label, weight:s.weight, rate:round(r.rate), contribution:round(contribution), explanation:r.explanation, isDelta:!!r.isDelta }; }); const rule = breakdown.find(x => x.type === 'RULE_BASED')?.rate || 0; const rate = Math.max(0, Math.min(1.5, Math.max(rule - .2, Math.min(rule + .2, base + delta)))); return { rate:round(rate), breakdown, plan:active, rBase:round(base), managerDelta:round(delta) }; }
   function addPlanVersion(plan, actor = 'admin') { if (actor !== 'admin') return { valid:false, errors:['Chỉ Admin được tạo cấu hình.'] }; const c = validateCompPlan(plan); if (!c.valid) return c; const version = Math.max(0, ...plans.filter(p => p.department === plan.department).map(p => +p.version || 0)) + 1; const record = { ...plan, version, status:'DRAFT', created_by:actor }; plans.push(record); return { valid:true, plan:record }; }
   function submitPlan(dept, version, actor = 'admin') { const p = plans.find(x => x.department === dept && +x.version === +version); if (actor !== 'admin' || !p || p.status !== 'DRAFT') return { valid:false, errors:['Không có quyền hoặc cấu hình không ở trạng thái nháp.'] }; p.status='PENDING_APPROVAL'; return { valid:true, plan:p }; }

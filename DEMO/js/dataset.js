@@ -478,6 +478,24 @@
       });
     }
 
+    const engine = global.IncentiveEngine || (typeof window !== 'undefined' ? window.IncentiveEngine : null);
+    if (engine) {
+      employees.forEach(emp => {
+        const calc = engine.calculateEmployeeIncentive({
+          target: emp.target,
+          actual: emp.actual,
+          difficultyFactor: emp.difficultyFactor || 1.0,
+          targetIncentive: emp.targetIncentive || BASE_BONUS
+        });
+        emp.achievementRate = calc.achievementRate;
+        emp.payoutFactor = calc.payoutFactor;
+        emp.incentiveAmount = calc.incentiveAmount;
+        if (emp.finalIncentive === undefined) {
+          emp.finalIncentive = calc.incentiveAmount;
+        }
+      });
+    }
+
     return employees;
   }
 
